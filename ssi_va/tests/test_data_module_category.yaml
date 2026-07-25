@@ -1,0 +1,123 @@
+scenarios:
+  - name: "Master data groups point to Financial Accounting - Configurator category"
+    steps:
+      - step: "Get va_biller_group by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_biller_group"
+        save_as: "va_biller_group"
+      - step: "Get va_biller_merchant_group by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_biller_merchant_group"
+        save_as: "va_biller_merchant_group"
+      - step: "Get va_generator_type_group by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_type_group"
+        save_as: "va_generator_type_group"
+      - step: "Get va_generator_exporter_group by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_exporter_group"
+        save_as: "va_generator_exporter_group"
+      - step: "Assert va_biller_group category_id"
+        action: "assert"
+        target: "va_biller_group"
+        asserts:
+          category_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.financial_accounting_configurator_module_category"
+      - step: "Assert va_biller_merchant_group category_id"
+        action: "assert"
+        target: "va_biller_merchant_group"
+        asserts:
+          category_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.financial_accounting_configurator_module_category"
+      - step: "Assert va_generator_type_group category_id"
+        action: "assert"
+        target: "va_generator_type_group"
+        asserts:
+          category_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.financial_accounting_configurator_module_category"
+      - step: "Assert va_generator_exporter_group category_id"
+        action: "assert"
+        target: "va_generator_exporter_group"
+        asserts:
+          category_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.financial_accounting_configurator_module_category"
+
+  - name:
+      "va_generator_workflow_module_category is reparented under Financial Accounting -
+      Workflow"
+    steps:
+      - step: "Get va_generator_workflow_module_category by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_workflow_module_category"
+        save_as: "va_generator_workflow_module_category"
+      - step: "Assert parent_id and name"
+        action: "assert"
+        target: "va_generator_workflow_module_category"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.financial_accounting_module_category"
+          name:
+            type: "value"
+            expected: "Virtual Account Generator"
+
+  - name:
+      "va_generator_data_ownership_module_category is reparented under Financial
+      Accounting - Data Ownership"
+    steps:
+      - step: "Get va_generator_data_ownership_module_category by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_data_ownership_module_category"
+        save_as: "va_generator_data_ownership_module_category"
+      - step: "Assert parent_id and name"
+        action: "assert"
+        target: "va_generator_data_ownership_module_category"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.financial_accounting_data_ownership_module_category"
+          name:
+            type: "value"
+            expected: "Virtual Account Generator"
+
+  - name:
+      "Regression guard: va_generator workflow/data ownership groups still point to
+      va_generator categories"
+    steps:
+      - step: "Get va_generator_viewer_group by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_viewer_group"
+        save_as: "va_generator_viewer_group"
+      - step: "Get va_generator_company_group by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_company_group"
+        save_as: "va_generator_company_group"
+      - step: "Assert va_generator_viewer_group category_id"
+        action: "assert"
+        target: "va_generator_viewer_group"
+        asserts:
+          category_id:
+            type: "m2o"
+            expected_xml_id: "ssi_va.va_generator_workflow_module_category"
+      - step: "Assert va_generator_company_group category_id"
+        action: "assert"
+        target: "va_generator_company_group"
+        asserts:
+          category_id:
+            type: "m2o"
+            expected_xml_id: "ssi_va.va_generator_data_ownership_module_category"
+
+  - name: "No orphan Virtual Account application category remains"
+    steps:
+      - step:
+          "Search ir.module.category with name Virtual Account or Virtual Account -
+          Configurator"
+        action: "search"
+        model: "ir.module.category"
+        domain: [["name", "in", ["Virtual Account", "Virtual Account - Configurator"]]]
+        save_as: "orphan_va_categories"
+        expect_count: 0

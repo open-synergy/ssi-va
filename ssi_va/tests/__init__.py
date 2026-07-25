@@ -8,3 +8,4 @@ from . import test_va_generator_type
 from . import test_va_generator
 from . import test_va_generator_exporter
 from . import test_menu
+from . import test_module_category

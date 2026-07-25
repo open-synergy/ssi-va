@@ -25,7 +25,6 @@
         "python": ["xlsxwriter"],
     },
     "data": [
-        "security/ir_module_category_data.xml",
         "security/ir_module_category/va_generator.xml",
         "security/res_groups/va_biller.xml",
         "security/res_groups/va_biller_merchant.xml",

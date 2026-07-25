@@ -5,11 +5,17 @@
 <odoo>
 <record id="va_generator_workflow_module_category" model="ir.module.category">
     <field name="name">Virtual Account Generator</field>
-    <field name="parent_id" ref="virtual_account_module_category" />
+    <field
+            name="parent_id"
+            ref="ssi_financial_accounting.financial_accounting_module_category"
+        />
 </record>
 
 <record id="va_generator_data_ownership_module_category" model="ir.module.category">
     <field name="name">Virtual Account Generator</field>
-    <field name="parent_id" ref="virtual_account_module_category" />
+    <field
+            name="parent_id"
+            ref="ssi_financial_accounting.financial_accounting_data_ownership_module_category"
+        />
 </record>
 </odoo>
