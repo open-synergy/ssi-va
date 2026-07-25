@@ -4,15 +4,9 @@
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
 <menuitem
-        id="menu_virtual_account_root"
-        name="Virtual Account"
-        web_icon="ssi_va,static/description/icon.png"
-    />
-
-<menuitem
         id="menu_virtual_account_configuration"
-        name="Configuration"
-        parent="menu_virtual_account_root"
-        sequence="99"
+        name="Virtual Account"
+        parent="ssi_financial_accounting.menu_financial_accounting_configuration"
+        sequence="240"
     />
 </odoo>

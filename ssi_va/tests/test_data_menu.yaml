@@ -1,0 +1,70 @@
+scenarios:
+  - name: "va_generator_menu is reparented under Financial Accounting Bank & Cash"
+    steps:
+      - step: "Get va_generator_menu by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_menu"
+        save_as: "va_generator_menu"
+      - step: "Assert parent_id and name"
+        action: "assert"
+        target: "va_generator_menu"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.menu_bank_cash"
+          name:
+            type: "value"
+            expected: "VA Generators"
+
+  - name:
+      "menu_virtual_account_configuration is reparented under Financial Accounting
+      Configuration"
+    steps:
+      - step: "Get menu_virtual_account_configuration by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.menu_virtual_account_configuration"
+        save_as: "menu_virtual_account_configuration"
+      - step: "Assert parent_id and name"
+        action: "assert"
+        target: "menu_virtual_account_configuration"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected_xml_id: "ssi_financial_accounting.menu_financial_accounting_configuration"
+          name:
+            type: "value"
+            expected: "Virtual Account"
+
+  - name: "Configuration leaf menus still point to menu_virtual_account_configuration"
+    steps:
+      - step: "Get va_biller_menu by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_biller_menu"
+        save_as: "va_biller_menu"
+      - step: "Get va_generator_exporter_menu by XML ID"
+        action: "ref"
+        xml_id: "ssi_va.va_generator_exporter_menu"
+        save_as: "va_generator_exporter_menu"
+      - step: "Assert va_biller_menu parent_id"
+        action: "assert"
+        target: "va_biller_menu"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected_xml_id: "ssi_va.menu_virtual_account_configuration"
+      - step: "Assert va_generator_exporter_menu parent_id"
+        action: "assert"
+        target: "va_generator_exporter_menu"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected_xml_id: "ssi_va.menu_virtual_account_configuration"
+
+  - name: "No orphan root menu named Virtual Account remains"
+    steps:
+      - step: "Search ir.ui.menu with name Virtual Account and no parent"
+        action: "search"
+        model: "ir.ui.menu"
+        domain: [["name", "=", "Virtual Account"], ["parent_id", "=", false]]
+        save_as: "orphan_root_menus"
+        expect_count: 0
