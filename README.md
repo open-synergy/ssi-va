@@ -21,8 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[ssi_va](ssi_va/) | 14.0.1.0.0 |  | Virtual Account
-[ssi_virtual_account](ssi_virtual_account/) | 14.0.1.0.0 |  | Virtual Account Management
+[ssi_va](ssi_va/) | 14.0.1.1.0 |  | Virtual Account
 
 [//]: # (end addons)
 

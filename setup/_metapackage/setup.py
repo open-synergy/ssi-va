@@ -9,7 +9,6 @@ setuptools.setup(
     version=version,
     install_requires=[
         'odoo14-addon-ssi_va',
-        'odoo14-addon-ssi_virtual_account',
     ],
     classifiers=[
         'Programming Language :: Python',
