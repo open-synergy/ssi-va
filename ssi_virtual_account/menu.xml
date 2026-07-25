@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 OpenSynergy Indonesia
+     Copyright 2026 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<menuitem
+        id="menu_virtual_account_root"
+        name="Virtual Account"
+        web_icon="ssi_virtual_account,static/description/icon.png"
+    />
+
+<menuitem
+        id="menu_virtual_account_configuration"
+        name="Configuration"
+        parent="menu_virtual_account_root"
+        sequence="99"
+    />
+</odoo>
