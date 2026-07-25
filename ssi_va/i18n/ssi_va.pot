@@ -180,6 +180,7 @@ msgid "Bank that issued the biller code for this Virtual Account."
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__biller_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator__biller_id
 #: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_search
 msgid "Biller"
@@ -216,6 +217,11 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller_code__va_biller_id
 msgid "Biller that owns this bank-specific Virtual Account code."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_generate_va__biller_id
+msgid "Biller the generated Virtual Account numbers are for."
 msgstr ""
 
 #. module: ssi_va
@@ -288,6 +294,11 @@ msgid "Can Restart Approval"
 msgstr ""
 
 #. module: ssi_va
+#: model_terms:ir.ui.view,arch_db:ssi_va.generate_va_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator__cancel_reason_id
 msgid "Cancel Reason"
 msgstr ""
@@ -347,6 +358,7 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__create_uid
@@ -359,6 +371,7 @@ msgid "Created by"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__create_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__create_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__create_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__create_date
@@ -386,6 +399,7 @@ msgid "Determines the display order of biller codes within a merchant."
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__display_name
@@ -461,6 +475,19 @@ msgid "Format"
 msgstr ""
 
 #. module: ssi_va
+#: code:addons/ssi_va/wizards/generate_va.py:0
+#: model:ir.actions.act_window,name:ssi_va.generate_va_action
+#: model_terms:ir.ui.view,arch_db:ssi_va.generate_va_view_form
+#, python-format
+msgid "Generate VA"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model,name:ssi_va.model_generate_va
+msgid "Generate Virtual Account"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator__bank_account_ids
 #: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_form
 msgid "Generated Bank Accounts"
@@ -472,6 +499,7 @@ msgid "Generator Exporters"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__type_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator__type_id
 #: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_search
 msgid "Generator Type"
@@ -490,6 +518,14 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_generate_va__type_id
+msgid ""
+"Generator type whose python_code computes the unique VA code. Only generator"
+" types not restricted to a model, or restricted to Contact, are offered."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__id
 #: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__id
@@ -553,6 +589,7 @@ msgid "Is Follower"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code____last_update
@@ -566,6 +603,7 @@ msgid "Last Modified on"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__write_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__write_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__write_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__write_uid
@@ -578,6 +616,7 @@ msgid "Last Updated by"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__write_date
@@ -649,6 +688,7 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__merchant_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator__merchant_id
 msgid "Merchant"
 msgstr ""
@@ -810,12 +850,34 @@ msgid "Number of unread messages"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_generate_va__merchant_id
+msgid ""
+"Optional merchant under the selected biller. Only merchants that have a "
+"biller code registered for the selected biller are offered. Left empty, "
+"Virtual Account numbers are generated at biller level."
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_generator__merchant_id
 msgid ""
 "Optional merchant under the selected biller. When set, Virtual Account "
 "numbers are generated at merchant level using the merchant code registered "
 "for the selected biller. Left empty, Virtual Account numbers are generated "
 "at biller level."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__partner_ids
+msgid "Partners"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_generate_va__partner_ids
+msgid ""
+"Partners to generate Virtual Account numbers for. One source data line is "
+"created on the resulting document for each partner selected here. Defaults "
+"to the Contact records selected in the list view this wizard was launched "
+"from."
 msgstr ""
 
 #. module: ssi_va
