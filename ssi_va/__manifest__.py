@@ -18,9 +18,12 @@
     "data": [
         "security/ir_module_category_data.xml",
         "security/res_groups/va_biller.xml",
+        "security/res_groups/va_biller_merchant.xml",
         "security/ir_model_access/va_biller.xml",
+        "security/ir_model_access/va_biller_merchant.xml",
         "menu.xml",
         "views/va_biller.xml",
+        "views/va_biller_merchant.xml",
     ],
     "demo": [],
 }
