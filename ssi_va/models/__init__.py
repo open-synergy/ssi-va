@@ -7,3 +7,6 @@ from . import va_biller_code
 from . import va_biller_merchant
 from . import va_biller_merchant_code
 from . import va_generator_type
+from . import va_generator
+from . import va_generator_source_data
+from . import res_partner_bank

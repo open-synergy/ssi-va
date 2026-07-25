@@ -5,3 +5,4 @@
 from . import test_va_biller
 from . import test_va_biller_merchant
 from . import test_va_generator_type
+from . import test_va_generator
