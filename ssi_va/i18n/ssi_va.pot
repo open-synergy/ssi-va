@@ -19,13 +19,25 @@ msgid "# Biller"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__name
+msgid "# Document"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__va_biller_merchant_id
 msgid "# Merchant"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__va_generator_id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__va_generator_id
+msgid "# VA Generator"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_needaction
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_needaction
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_needaction
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_needaction
 msgid "Action Needed"
 msgstr ""
@@ -38,8 +50,24 @@ msgid "Active"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__active_approval_ids
+msgid "Active Approvals"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__active_approver_partner_ids
+msgid "Active Partners"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__active_approver_user_ids
+msgid "Active Users"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_ids
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_ids
 msgid "Activities"
 msgstr ""
@@ -47,6 +75,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_exception_decoration
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_exception_decoration
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_exception_decoration
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr ""
@@ -54,6 +83,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_state
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_state
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_state
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_state
 msgid "Activity State"
 msgstr ""
@@ -61,13 +91,53 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_type_icon
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_type_icon
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_type_icon
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_type_icon
 msgid "Activity Type Icon"
 msgstr ""
 
 #. module: ssi_va
+#: model:res.groups,name:ssi_va.va_generator_all_group
+msgid "All"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__allowed_policy_template_ids
+msgid "Allowed Policy Templates"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__approval_template_id
+msgid "Approval Configuration"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__approval_template_id
+msgid "Approval Template"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__approval_ids
+msgid "Approvals"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__approve_ok
+msgid ""
+"Approve policy\n"
+"\n"
+"* If active user can see and execute 'Approve' button"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__approved
+msgid "Approved"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_attachment_count
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_attachment_count
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_attachment_count
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_attachment_count
 msgid "Attachment Count"
 msgstr ""
@@ -76,6 +146,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__bank_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__bank_id
 msgid "Bank"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model,name:ssi_va.model_res_partner_bank
+msgid "Bank Accounts"
 msgstr ""
 
 #. module: ssi_va
@@ -94,6 +169,12 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller_code__bank_id
 msgid "Bank that issued the biller code for this Virtual Account."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__biller_id
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_search
+msgid "Biller"
 msgstr ""
 
 #. module: ssi_va
@@ -130,6 +211,13 @@ msgid "Biller that owns this bank-specific Virtual Account code."
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__biller_id
+msgid ""
+"Biller this generation batch is for. Determines the biller code(s) used when"
+" composing generated Virtual Account numbers."
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant_code__biller_id
 msgid ""
 "Biller-bank code line that this merchant code is registered for. The bank is"
@@ -142,10 +230,88 @@ msgid "Billers"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__approve_ok
+msgid "Can Approve"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__cancel_ok
+msgid "Can Cancel"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__confirm_ok
+msgid "Can Confirm"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__done_ok
+msgid "Can Finished"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__manual_number_ok
+msgid "Can Input Manual Document Number"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__reject_ok
+msgid "Can Reject"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__restart_ok
+msgid "Can Restart"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__restart_approval_ok
+msgid "Can Restart Approval"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__cancel_reason_id
+msgid "Cancel Reason"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__cancel_ok
+msgid ""
+"Cancel policy\n"
+"\n"
+"* If active user can see and execute 'Cancel' button"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__code
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__code
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__code
 msgid "Code"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__company_id
+#: model:res.groups,name:ssi_va.va_generator_company_group
+msgid "Company"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__company_partner_id
+msgid "Company Partner"
+msgstr ""
+
+#. module: ssi_va
+#: model:res.groups,name:ssi_va.va_generator_company_child_group
+msgid "Company and All Child Companies"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__company_id
+msgid ""
+"Company that own the document\n"
+"\n"
+"* Automatically filled with user's company.\n"
+"  Default company can be changed"
 msgstr ""
 
 #. module: ssi_va
@@ -154,10 +320,20 @@ msgid "Configuration"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__confirm_ok
+msgid ""
+"Confirm policy\n"
+"\n"
+"* If active user can see and execute 'Confirm' button"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__create_uid
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__create_uid
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__create_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__create_uid
 msgid "Created by"
 msgstr ""
@@ -167,8 +343,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__create_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__create_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__create_date
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__create_date
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__create_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_source_data__res_id
+msgid "Database ID of the source record within Source Model."
 msgstr ""
 
 #. module: ssi_va
@@ -182,17 +365,29 @@ msgid "Determines the display order of biller codes within a merchant."
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__display_name
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__display_name
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__done_ok
+msgid ""
+"Done policy\n"
+"\n"
+"* If active user can see and execute 'Done' button"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_follower_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_follower_ids
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_follower_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_follower_ids
 msgid "Followers"
 msgstr ""
@@ -200,6 +395,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_channel_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_channel_ids
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_channel_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_channel_ids
 msgid "Followers (Channels)"
 msgstr ""
@@ -207,6 +403,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_partner_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_partner_ids
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_partner_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
@@ -214,8 +411,21 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__activity_type_icon
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__activity_type_icon
+#: model:ir.model.fields,help:ssi_va.field_va_generator__activity_type_icon
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__bank_account_ids
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_form
+msgid "Generated Bank Accounts"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__type_id
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_search
+msgid "Generator Type"
 msgstr ""
 
 #. module: ssi_va
@@ -224,10 +434,25 @@ msgid "Generator Types"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__type_id
+msgid ""
+"Generator type whose python_code computes the unique VA code appended to the"
+" biller/merchant code for every generated Virtual Account number."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.ui.menu,name:ssi_va.va_generator_menu
+msgid "Generators"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__id
 msgid "ID"
 msgstr ""
@@ -235,6 +460,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_exception_icon
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_exception_icon
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_exception_icon
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_exception_icon
 msgid "Icon"
 msgstr ""
@@ -242,6 +468,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__activity_exception_icon
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__activity_exception_icon
+#: model:ir.model.fields,help:ssi_va.field_va_generator__activity_exception_icon
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr ""
@@ -251,6 +478,8 @@ msgstr ""
 #: model:ir.model.fields,help:ssi_va.field_va_biller__message_unread
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__message_needaction
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__message_unread
+#: model:ir.model.fields,help:ssi_va.field_va_generator__message_needaction
+#: model:ir.model.fields,help:ssi_va.field_va_generator__message_unread
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__message_needaction
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__message_unread
 msgid "If checked, new messages require your attention."
@@ -259,6 +488,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__message_has_error
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__message_has_error
+#: model:ir.model.fields,help:ssi_va.field_va_generator__message_has_error
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__message_has_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
@@ -266,15 +496,19 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_is_follower
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_is_follower
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_is_follower
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_is_follower
 msgid "Is Follower"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code____last_update
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator____last_update
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type____last_update
 msgid "Last Modified on"
 msgstr ""
@@ -284,6 +518,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__write_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__write_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__write_uid
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__write_uid
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__write_uid
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -293,6 +529,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__write_date
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__write_date
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -314,8 +552,17 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_main_attachment_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_main_attachment_id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_main_attachment_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_main_attachment_id
 msgid "Main Attachment"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__manual_number_ok
+msgid ""
+"Manual number assignment policy\n"
+"\n"
+"* If active user can edit document number"
 msgstr ""
 
 #. module: ssi_va
@@ -345,6 +592,11 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__merchant_id
+msgid "Merchant"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__merchant_code
 msgid "Merchant Code"
 msgstr ""
@@ -364,6 +616,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_has_error
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_has_error
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_has_error
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_has_error
 msgid "Message Delivery error"
 msgstr ""
@@ -371,8 +624,14 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_ids
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_ids
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_ids
 msgid "Messages"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__model_name
+msgid "Model"
 msgstr ""
 
 #. module: ssi_va
@@ -386,6 +645,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__my_activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__my_activity_date_deadline
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__my_activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr ""
@@ -398,8 +658,14 @@ msgid "Name"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__need_validation
+msgid "Need Validation"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_date_deadline
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr ""
@@ -407,6 +673,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_summary
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_summary
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_summary
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_summary
 msgid "Next Activity Summary"
 msgstr ""
@@ -414,13 +681,20 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_type_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_type_id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_type_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_type_id
 msgid "Next Activity Type"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__next_approval_ids
+msgid "Next Approvals"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__note
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__note
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__note
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__note
 msgid "Note"
 msgstr ""
@@ -428,6 +702,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_needaction_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_needaction_counter
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_needaction_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_needaction_counter
 msgid "Number of Actions"
 msgstr ""
@@ -435,6 +710,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_has_error_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_has_error_counter
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_has_error_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_has_error_counter
 msgid "Number of errors"
 msgstr ""
@@ -442,6 +718,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__message_needaction_counter
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__message_needaction_counter
+#: model:ir.model.fields,help:ssi_va.field_va_generator__message_needaction_counter
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__message_needaction_counter
 msgid "Number of messages which requires an action"
 msgstr ""
@@ -449,6 +726,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__message_has_error_counter
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__message_has_error_counter
+#: model:ir.model.fields,help:ssi_va.field_va_generator__message_has_error_counter
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr ""
@@ -456,8 +734,23 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__message_unread_counter
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__message_unread_counter
+#: model:ir.model.fields,help:ssi_va.field_va_generator__message_unread_counter
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__message_unread_counter
 msgid "Number of unread messages"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__merchant_id
+msgid ""
+"Optional merchant under the selected biller. When set, Virtual Account "
+"numbers are generated at merchant level using the merchant code registered "
+"for the selected biller. Left empty, Virtual Account numbers are generated "
+"at biller level."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__policy_template_id
+msgid "Policy Template"
 msgstr ""
 
 #. module: ssi_va
@@ -474,15 +767,62 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_source_data__source_data_id
+msgid ""
+"Read-only reference to the source record, derived from Source Model and "
+"Source Record ID. Used for display/navigation purposes only."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__reject_ok
+msgid ""
+"Reject policy\n"
+"\n"
+"* If active user can see and execute 'Reject' button"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__rejected
+msgid "Rejected"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__user_id
+msgid "Responsible"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__activity_user_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__activity_user_id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__activity_user_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__activity_user_id
 msgid "Responsible User"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__restart_approval_ok
+msgid ""
+"Restart approval policy\n"
+"\n"
+"* If active user can see and execute 'Restart Approval' button"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__restart_ok
+msgid ""
+"Restart policy\n"
+"\n"
+"* If active user can see and execute 'Restart' button"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__model_id
 msgid "Restrict to Model"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__reviewer_id
+msgid "Reviewer"
 msgstr ""
 
 #. module: ssi_va
@@ -492,8 +832,39 @@ msgid "Sequence"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__source_data_ids
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__source_data_id
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_form
+msgid "Source Data"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__model_id
+msgid "Source Model"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__res_id
+msgid "Source Record ID"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__source_data_ids
+msgid ""
+"Source records (e.g. partners) that Virtual Account numbers are generated "
+"for. Populated through a dedicated wizard (implemented separately) or "
+"directly via ORM — not meant to be filled in manually by the user."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__state
+msgid "State"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__activity_state
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__activity_state
+#: model:ir.model.fields,help:ssi_va.field_va_generator__activity_state
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__activity_state
 msgid ""
 "Status based on activities\n"
@@ -503,8 +874,36 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_source_data__model_id
+msgid ""
+"Technical model of the source record that Virtual Account numbers are "
+"generated for."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_source_data__model_name
+msgid ""
+"Technical name of the source model, derived from Source Model. Used to "
+"resolve the source record."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__name
+msgid ""
+"Transaction/document number\n"
+"\n"
+"* Unique indentifer of transaction\n"
+"* Leave '/' to automatically generate number\n"
+"* Change '/' into any number/identifier to manually assign number.\n"
+"  Manual number assignment can be done in 'Draft' state\n"
+"  Only user with 'Can Manualy Assign Number' policy can manually assign number.\n"
+"* Transaction with number other than '/' can not be deleted."
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_va.field_va_biller_merchant__activity_exception_decoration
+#: model:ir.model.fields,help:ssi_va.field_va_generator__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_va.field_va_generator_type__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr ""
@@ -512,6 +911,7 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_unread
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_unread
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_unread
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_unread
 msgid "Unread Messages"
 msgstr ""
@@ -519,8 +919,59 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant__message_unread_counter
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_unread_counter
 msgid "Unread Messages Counter"
+msgstr ""
+
+#. module: ssi_va
+#: model:res.groups,name:ssi_va.va_generator_user_group
+msgid "User"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__user_id
+msgid ""
+"User that responsible for document\n"
+"\n"
+"* Create user can be different with responsible user\n"
+"* Automatically filled with user that initiate document creation.\n"
+"  Default responsible can be changed."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__reviewer_id
+msgid ""
+"User that responsible to review document\n"
+"\n"
+"* Unless it configured to approve reviewer does not equal to approver"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__active_approver_user_ids
+msgid "Users that can approve/reject document"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_res_partner_bank__va_generator_id
+msgid ""
+"VA generator document that created this bank account, if any. Empty for bank"
+" accounts created manually or by other means."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_source_data__va_generator_id
+msgid "VA generator document that this source data line belongs to."
+msgstr ""
+
+#. module: ssi_va
+#: model:res.groups,name:ssi_va.va_generator_validator_group
+msgid "Validator"
+msgstr ""
+
+#. module: ssi_va
+#: model:res.groups,name:ssi_va.va_generator_viewer_group
+msgid "Viewer"
 msgstr ""
 
 #. module: ssi_va
@@ -567,6 +1018,18 @@ msgid "Virtual Account Billers"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model,name:ssi_va.model_va_generator
+#: model:ir.module.category,name:ssi_va.va_generator_data_ownership_module_category
+#: model:ir.module.category,name:ssi_va.va_generator_workflow_module_category
+msgid "Virtual Account Generator"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model,name:ssi_va.model_va_generator_source_data
+msgid "Virtual Account Generator - Source Data"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model,name:ssi_va.model_va_generator_type
 #: model:res.groups,name:ssi_va.va_generator_type_group
 msgid "Virtual Account Generator Type"
@@ -575,4 +1038,16 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.actions.act_window,name:ssi_va.va_generator_type_action
 msgid "Virtual Account Generator Types"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.actions.act_window,name:ssi_va.va_generator_action
+msgid "Virtual Account Generators"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__bank_account_ids
+msgid ""
+"Virtual Account bank accounts generated by this document once it reaches the"
+" done state."
 msgstr ""
