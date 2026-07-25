@@ -1,0 +1,102 @@
+setup:
+  steps:
+    - step: "Get ir.model record for res.partner"
+      action: "ref"
+      xml_id: "base.model_res_partner"
+      save_as: "model_res_partner"
+
+scenarios:
+  - name: "Create va_generator_type"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "ABC123"'
+      - step: "Assert generator type created with active default true"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          name:
+            type: "value"
+            expected: "Sequence Based"
+          active:
+            type: "value"
+            expected: true
+
+  - name: "Write va_generator_type name"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "ABC123"'
+      - step: "Write new name"
+        action: "write"
+        target: "generator_type"
+        values:
+          name: "Sequence Based Updated"
+      - step: "Assert name updated"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          name:
+            type: "value"
+            expected: "Sequence Based Updated"
+
+  - name: "Create va_generator_type with model_id"
+    steps:
+      - step: "Create generator type restricted to res.partner"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Partner Based"
+          code: "/"
+          python_code: 'result = "ABC123"'
+          model_id: "REC: model_res_partner.id"
+      - step: "Assert model_id refers to res.partner"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          model_id.model:
+            type: "value"
+            expected: "res.partner"
+      - step: "Write model_id to empty"
+        action: "write"
+        target: "generator_type"
+        values:
+          model_id: false
+      - step: "Assert model_id is empty"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          model_id:
+            type: "value"
+            operator: "is_falsy"
+
+  - name: "generate_code with invalid python_code raises UserError"
+    steps:
+      - step: "Create generator type with invalid python_code"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Broken Generator"
+          code: "/"
+          python_code: "result = undefined_variable"
+      - step: "Calling generate_code must fail"
+        action: "call"
+        target: "generator_type"
+        method: "generate_code"
+        expect_error:
+          type: "UserError"

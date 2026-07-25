@@ -14,16 +14,20 @@
     "application": True,
     "depends": [
         "ssi_master_data_mixin",
+        "ssi_localdict_mixin",
     ],
     "data": [
         "security/ir_module_category_data.xml",
         "security/res_groups/va_biller.xml",
         "security/res_groups/va_biller_merchant.xml",
+        "security/res_groups/va_generator_type.xml",
         "security/ir_model_access/va_biller.xml",
         "security/ir_model_access/va_biller_merchant.xml",
+        "security/ir_model_access/va_generator_type.xml",
         "menu.xml",
         "views/va_biller.xml",
         "views/va_biller_merchant.xml",
+        "views/va_generator_type.xml",
     ],
     "demo": [],
 }
