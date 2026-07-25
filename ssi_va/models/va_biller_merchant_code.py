@@ -51,8 +51,7 @@ class VABillerMerchantCode(models.Model):
     sequence = fields.Integer(
         string="Sequence",
         default=10,
-        help="Determines the display order of biller codes within a "
-        "merchant.",
+        help="Determines the display order of biller codes within a " "merchant.",
     )
 
     @api.constrains("va_biller_merchant_id", "biller_id")
