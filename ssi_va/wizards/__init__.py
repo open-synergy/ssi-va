@@ -2,6 +2,4 @@
 # Copyright 2026 PT. Simetri Sinergi Indonesia
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from . import models
-from . import wizards
-from . import tests  # noqa: F401
+from . import generate_va
