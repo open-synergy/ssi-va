@@ -19,6 +19,9 @@
         "ssi_transaction_done_mixin",
         "ssi_transaction_cancel_mixin",
     ],
+    "external_dependencies": {
+        "python": ["xlsxwriter"],
+    },
     "data": [
         "security/ir_module_category_data.xml",
         "security/ir_module_category/va_generator.xml",

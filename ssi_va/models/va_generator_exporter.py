@@ -109,7 +109,7 @@ Document Type: %s
 Context: Generate export file
 Database ID: %s
 Problem: python_code assigned a value to 'result' that is not a list of list/tuple rows
-Solution: Fix python_code so 'result' is a list where each item is a list or tuple representing one row
+Solution: Fix python_code so 'result' is a list where each item is a list or tuple
 """ % (
                 self._description,
                 self.id,
