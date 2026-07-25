@@ -305,6 +305,10 @@ scenarios:
         target: "generator"
         method: "action_confirm"
         as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
       - step: "Approve VA generator, which triggers action_done"
         action: "call"
         target: "generator"
