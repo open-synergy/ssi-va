@@ -59,9 +59,7 @@ class VAGeneratorSourceData(models.Model):
 
     @api.model
     def _selection_target_model(self):
-        return [
-            (model.model, model.name) for model in self.env["ir.model"].search([])
-        ]
+        return [(model.model, model.name) for model in self.env["ir.model"].search([])]
 
     @api.depends("model_name", "res_id")
     def _compute_source_data_id(self):

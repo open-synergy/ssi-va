@@ -40,9 +40,6 @@
 <record id="va_generator_all_group" model="res.groups">
     <field name="name">All</field>
     <field name="category_id" ref="va_generator_data_ownership_module_category" />
-    <field
-            name="implied_ids"
-            eval="[(4, ref('va_generator_company_child_group'))]"
-        />
+    <field name="implied_ids" eval="[(4, ref('va_generator_company_child_group'))]" />
 </record>
 </odoo>

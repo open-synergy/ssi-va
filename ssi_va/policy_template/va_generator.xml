@@ -15,10 +15,7 @@
 </record>
 
 <!-- confirm -->
-<record
-        id="va_generator_policy_template_detail_confirm"
-        model="policy.template_detail"
-    >
+<record id="va_generator_policy_template_detail_confirm" model="policy.template_detail">
     <field name="template_id" ref="va_generator_policy_template" />
     <field
             name="field_id"
@@ -36,10 +33,7 @@
 </record>
 
 <!-- approve -->
-<record
-        id="va_generator_policy_template_detail_approve"
-        model="policy.template_detail"
-    >
+<record id="va_generator_policy_template_detail_approve" model="policy.template_detail">
     <field name="template_id" ref="va_generator_policy_template" />
     <field
             name="field_id"
@@ -58,10 +52,7 @@ if env.user.id in document.active_approver_user_ids.ids:
 </record>
 
 <!-- reject -->
-<record
-        id="va_generator_policy_template_detail_reject"
-        model="policy.template_detail"
-    >
+<record id="va_generator_policy_template_detail_reject" model="policy.template_detail">
     <field name="template_id" ref="va_generator_policy_template" />
     <field
             name="field_id"
@@ -104,10 +95,7 @@ if not document.approval_template_id:
 </record>
 
 <!-- cancel -->
-<record
-        id="va_generator_policy_template_detail_cancel"
-        model="policy.template_detail"
-    >
+<record id="va_generator_policy_template_detail_cancel" model="policy.template_detail">
     <field name="template_id" ref="va_generator_policy_template" />
     <field
             name="field_id"
@@ -125,10 +113,7 @@ if not document.approval_template_id:
 </record>
 
 <!-- restart -->
-<record
-        id="va_generator_policy_template_detail_restart"
-        model="policy.template_detail"
-    >
+<record id="va_generator_policy_template_detail_restart" model="policy.template_detail">
     <field name="template_id" ref="va_generator_policy_template" />
     <field
             name="field_id"
