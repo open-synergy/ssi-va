@@ -47,8 +47,8 @@ scenarios:
             expected_xml_id: "ssi_financial_accounting.financial_accounting_configurator_module_category"
 
   - name:
-      "va_generator_workflow_module_category is reparented under Financial
-      Accounting - Workflow"
+      "va_generator_workflow_module_category is reparented under Financial Accounting -
+      Workflow"
     steps:
       - step: "Get va_generator_workflow_module_category by XML ID"
         action: "ref"
@@ -66,8 +66,8 @@ scenarios:
             expected: "Virtual Account Generator"
 
   - name:
-      "va_generator_data_ownership_module_category is reparented under
-      Financial Accounting - Data Ownership"
+      "va_generator_data_ownership_module_category is reparented under Financial
+      Accounting - Data Ownership"
     steps:
       - step: "Get va_generator_data_ownership_module_category by XML ID"
         action: "ref"
@@ -85,8 +85,8 @@ scenarios:
             expected: "Virtual Account Generator"
 
   - name:
-      "Regression guard: va_generator workflow/data ownership groups still
-      point to va_generator categories"
+      "Regression guard: va_generator workflow/data ownership groups still point to
+      va_generator categories"
     steps:
       - step: "Get va_generator_viewer_group by XML ID"
         action: "ref"
@@ -114,8 +114,8 @@ scenarios:
   - name: "No orphan Virtual Account application category remains"
     steps:
       - step:
-          "Search ir.module.category with name Virtual Account or Virtual
-          Account - Configurator"
+          "Search ir.module.category with name Virtual Account or Virtual Account -
+          Configurator"
         action: "search"
         model: "ir.module.category"
         domain: [["name", "in", ["Virtual Account", "Virtual Account - Configurator"]]]
