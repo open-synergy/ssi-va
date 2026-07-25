@@ -11,13 +11,15 @@
     ],
     "license": "AGPL-3",
     "installable": True,
-    "application": True,
+    "application": False,
+    "category": "Accounting",
     "depends": [
         "ssi_master_data_mixin",
         "ssi_localdict_mixin",
         "ssi_transaction_confirm_mixin",
         "ssi_transaction_done_mixin",
         "ssi_transaction_cancel_mixin",
+        "ssi_financial_accounting",
     ],
     "external_dependencies": {
         "python": ["xlsxwriter"],

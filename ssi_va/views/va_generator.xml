@@ -95,10 +95,10 @@
 
 <menuitem
         id="va_generator_menu"
-        name="Generators"
+        name="VA Generators"
         action="va_generator_action"
-        parent="menu_virtual_account_root"
+        parent="ssi_financial_accounting.menu_bank_cash"
         groups="va_generator_viewer_group"
-        sequence="10"
+        sequence="240"
     />
 </odoo>
