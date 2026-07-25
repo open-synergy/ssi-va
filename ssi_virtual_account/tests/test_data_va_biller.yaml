@@ -1,0 +1,202 @@
+setup:
+  steps:
+    - step: "Create bank BCA"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_bca"
+      values:
+        name: "Bank Central Asia"
+
+    - step: "Create bank Mandiri"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_mandiri"
+      values:
+        name: "Bank Mandiri"
+
+scenarios:
+  - name: "Create va_biller"
+    steps:
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Assert biller created with active default true"
+        action: "assert"
+        target: "biller"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          name:
+            type: "value"
+            expected: "Biller A"
+          active:
+            type: "value"
+            expected: true
+
+  - name: "Write va_biller name"
+    steps:
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Write new name"
+        action: "write"
+        target: "biller"
+        values:
+          name: "Biller A Updated"
+      - step: "Assert name updated"
+        action: "assert"
+        target: "biller"
+        asserts:
+          name:
+            type: "value"
+            expected: "Biller A Updated"
+
+  - name: "Create va_biller with two bank codes"
+    steps:
+      - step: "Create biller with two bank code lines"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+          bank_code_ids:
+            - - 0
+              - 0
+              - bank_id: "REC: bank_bca.id"
+                biller_code: "BCA001"
+            - - 0
+              - 0
+              - bank_id: "REC: bank_mandiri.id"
+                biller_code: "MDR001"
+      - step: "Assert two bank codes created"
+        action: "assert"
+        target: "biller"
+        asserts:
+          bank_code_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 2
+      - step: "Find bank code for BCA"
+        action: "search"
+        model: "va_biller.code"
+        domain:
+          - ["va_biller_id", "=", "REC: biller.id"]
+          - ["bank_id", "=", "REC: bank_bca.id"]
+        save_as: "code_bca"
+        expect_count: 1
+      - step: "Assert BCA bank code values"
+        action: "assert"
+        target: "code_bca"
+        asserts:
+          bank_id:
+            type: "m2o"
+            expected: "REC: bank_bca"
+          biller_code:
+            type: "value"
+            expected: "BCA001"
+      - step: "Find bank code for Mandiri"
+        action: "search"
+        model: "va_biller.code"
+        domain:
+          - ["va_biller_id", "=", "REC: biller.id"]
+          - ["bank_id", "=", "REC: bank_mandiri.id"]
+        save_as: "code_mandiri"
+        expect_count: 1
+      - step: "Assert Mandiri bank code values"
+        action: "assert"
+        target: "code_mandiri"
+        asserts:
+          bank_id:
+            type: "m2o"
+            expected: "REC: bank_mandiri"
+          biller_code:
+            type: "value"
+            expected: "MDR001"
+
+  - name: "Unlink va_biller cascades bank codes"
+    steps:
+      - step: "Create biller with one bank code line"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller To Delete"
+          code: "/"
+          bank_code_ids:
+            - - 0
+              - 0
+              - bank_id: "REC: bank_bca.id"
+                biller_code: "BCA002"
+      - step: "Delete biller"
+        action: "unlink"
+        target: "biller"
+      - step: "Verify bank codes deleted via cascade"
+        action: "search"
+        model: "va_biller.code"
+        domain:
+          - ["va_biller_id", "=", "REC: biller.id"]
+        save_as: "result"
+        expect_count: 0
+
+  - name: "Duplicate bank_id on same biller is rejected"
+    steps:
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller B"
+          code: "/"
+      - step: "Create first bank code for BCA"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "code_1"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_bca.id"
+          biller_code: "BCA001"
+      - step: "Create second bank code for the same bank must fail"
+        action: "create"
+        model: "va_biller.code"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "already used"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_bca.id"
+          biller_code: "BCA999"
+
+  - name: "va_biller.code display_name uses custom format"
+    steps:
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_bca.id"
+          biller_code: "BCA001"
+      - step: "Assert display_name format"
+        action: "assert"
+        target: "code"
+        asserts:
+          display_name:
+            type: "value"
+            expected: "Biller A - Bank Central Asia (BCA001)"
