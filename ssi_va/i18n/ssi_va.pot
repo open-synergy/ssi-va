@@ -1067,14 +1067,8 @@ msgid "Viewer"
 msgstr ""
 
 #. module: ssi_va
-#: model:ir.module.category,name:ssi_va.virtual_account_module_category
 #: model:ir.ui.menu,name:ssi_va.menu_virtual_account_configuration
 msgid "Virtual Account"
-msgstr ""
-
-#. module: ssi_va
-#: model:ir.module.category,name:ssi_va.virtual_account_configurator_module_category
-msgid "Virtual Account - Configurator"
 msgstr ""
 
 #. module: ssi_va
