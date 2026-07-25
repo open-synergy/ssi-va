@@ -13,8 +13,14 @@
     "installable": True,
     "application": True,
     "depends": [
-        "base",
+        "ssi_master_data_mixin",
     ],
-    "data": [],
+    "data": [
+        "security/ir_module_category_data.xml",
+        "security/res_groups/va_biller.xml",
+        "security/ir_model_access/va_biller.xml",
+        "menu.xml",
+        "views/va_biller.xml",
+    ],
     "demo": [],
 }

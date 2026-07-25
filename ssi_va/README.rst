@@ -6,10 +6,11 @@
 Virtual Account
 ================
 
-Base module for Virtual Account (VA) integration. This module is intentionally
-empty (no models, views, or security) and serves as the foundation for
-subsequent Virtual Account modules (VA generation, export, and webhook
-delivery).
+Provides the ``va_biller`` master data — entities that receive payment
+through a Virtual Account (VA), each with a list of bank-specific biller
+codes (``va_biller.code``). This master data is the foundation used by
+subsequent Virtual Account generation, export, and webhook delivery
+features.
 
 
 Installation

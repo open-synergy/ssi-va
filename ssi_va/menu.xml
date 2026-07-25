@@ -6,7 +6,7 @@
 <menuitem
         id="menu_virtual_account_root"
         name="Virtual Account"
-        web_icon="ssi_virtual_account,static/description/icon.png"
+        web_icon="ssi_va,static/description/icon.png"
     />
 
 <menuitem
