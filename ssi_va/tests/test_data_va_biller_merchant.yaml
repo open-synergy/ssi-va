@@ -1,0 +1,212 @@
+setup:
+  steps:
+    - step: "Create bank A"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_a"
+      values:
+        name: "Bank A"
+
+    - step: "Create bank B"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_b"
+      values:
+        name: "Bank B"
+
+    - step: "Create supporting biller"
+      action: "create"
+      model: "va_biller"
+      save_as: "biller"
+      values:
+        name: "Biller X"
+        code: "/"
+
+    - step: "Create biller-bank code for bank A"
+      action: "create"
+      model: "va_biller.code"
+      save_as: "biller_code_a"
+      values:
+        va_biller_id: "REC: biller.id"
+        bank_id: "REC: bank_a.id"
+        biller_code: "BILLERA"
+
+    - step: "Create biller-bank code for bank B"
+      action: "create"
+      model: "va_biller.code"
+      save_as: "biller_code_b"
+      values:
+        va_biller_id: "REC: biller.id"
+        bank_id: "REC: bank_b.id"
+        biller_code: "BILLERB"
+
+scenarios:
+  - name: "Create va_biller_merchant"
+    steps:
+      - step: "Create merchant"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+      - step: "Assert merchant created with active default true"
+        action: "assert"
+        target: "merchant"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          name:
+            type: "value"
+            expected: "Merchant A"
+          active:
+            type: "value"
+            expected: true
+
+  - name: "Write va_biller_merchant name"
+    steps:
+      - step: "Create merchant"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+      - step: "Write new name"
+        action: "write"
+        target: "merchant"
+        values:
+          name: "Merchant A Updated"
+      - step: "Assert name updated"
+        action: "assert"
+        target: "merchant"
+        asserts:
+          name:
+            type: "value"
+            expected: "Merchant A Updated"
+
+  - name: "bank_id follows the selected biller-bank code"
+    steps:
+      - step: "Create merchant with one biller code line for bank A"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code_a.id"
+                merchant_code: "MERA001"
+      - step: "Find biller code line"
+        action: "search"
+        model: "va_biller_merchant.code"
+        domain:
+          - ["va_biller_merchant_id", "=", "REC: merchant.id"]
+        save_as: "line"
+        expect_count: 1
+      - step: "Assert bank_id follows biller_id (bank A)"
+        action: "assert"
+        target: "line"
+        asserts:
+          biller_id:
+            type: "m2o"
+            expected: "REC: biller_code_a"
+          bank_id:
+            type: "m2o"
+            expected: "REC: bank_a"
+          merchant_code:
+            type: "value"
+            expected: "MERA001"
+
+  - name: "Writing biller_id to another biller-bank code changes bank_id"
+    steps:
+      - step: "Create merchant with one biller code line for bank A"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code_a.id"
+                merchant_code: "MERA001"
+      - step: "Find biller code line"
+        action: "search"
+        model: "va_biller_merchant.code"
+        domain:
+          - ["va_biller_merchant_id", "=", "REC: merchant.id"]
+        save_as: "line"
+        expect_count: 1
+      - step: "Write biller_id to bank B code"
+        action: "write"
+        target: "line"
+        values:
+          biller_id: "REC: biller_code_b.id"
+      - step: "Assert bank_id changed to bank B"
+        action: "assert"
+        target: "line"
+        asserts:
+          biller_id:
+            type: "m2o"
+            expected: "REC: biller_code_b"
+          bank_id:
+            type: "m2o"
+            expected: "REC: bank_b"
+
+  - name: "Unlink va_biller_merchant cascades biller codes"
+    steps:
+      - step: "Create merchant with one biller code line"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant To Delete"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code_a.id"
+                merchant_code: "MERA002"
+      - step: "Delete merchant"
+        action: "unlink"
+        target: "merchant"
+      - step: "Verify biller codes deleted via cascade"
+        action: "search"
+        model: "va_biller_merchant.code"
+        domain:
+          - ["va_biller_merchant_id", "=", "REC: merchant.id"]
+        save_as: "result"
+        expect_count: 0
+
+  - name: "Duplicate biller_id on same merchant is rejected"
+    steps:
+      - step: "Create merchant"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant B"
+          code: "/"
+      - step: "Create first biller code for biller_code_a"
+        action: "create"
+        model: "va_biller_merchant.code"
+        save_as: "line_1"
+        values:
+          va_biller_merchant_id: "REC: merchant.id"
+          biller_id: "REC: biller_code_a.id"
+          merchant_code: "MERA001"
+      - step: "Create second biller code for the same biller_id must fail"
+        action: "create"
+        model: "va_biller_merchant.code"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "already used"
+        values:
+          va_biller_merchant_id: "REC: merchant.id"
+          biller_id: "REC: biller_code_a.id"
+          merchant_code: "MERA999"
