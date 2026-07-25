@@ -1,0 +1,102 @@
+scenarios:
+  - name: "Create va_generator_exporter"
+    steps:
+      - step: "Create exporter"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "Bank ABC VA Export"
+          code: "/"
+          python_code: 'result = [["VA", "Name"]]'
+      - step: "Assert exporter created with format/active default"
+        action: "assert"
+        target: "exporter"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          name:
+            type: "value"
+            expected: "Bank ABC VA Export"
+          format:
+            type: "value"
+            expected: "xlsx"
+          active:
+            type: "value"
+            expected: true
+
+  - name: "Write va_generator_exporter name"
+    steps:
+      - step: "Create exporter"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "Bank ABC VA Export"
+          code: "/"
+          python_code: 'result = [["VA", "Name"]]'
+      - step: "Write new name"
+        action: "write"
+        target: "exporter"
+        values:
+          name: "Bank ABC VA Export Updated"
+      - step: "Assert name updated"
+        action: "assert"
+        target: "exporter"
+        asserts:
+          name:
+            type: "value"
+            expected: "Bank ABC VA Export Updated"
+
+  - name: "Write format to invalid selection value raises ValueError"
+    steps:
+      - step: "Create exporter"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "Bank ABC VA Export"
+          code: "/"
+          python_code: 'result = [["VA", "Name"]]'
+      - step: "Write invalid format must fail"
+        action: "write"
+        target: "exporter"
+        values:
+          format: "pdf"
+        expect_error:
+          type: "ValueError"
+
+  - name: "generate_file with python_code referencing undefined name raises UserError"
+    steps:
+      - step: "Create exporter with invalid python_code"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "Broken Exporter"
+          code: "/"
+          python_code: "result = undefined_variable"
+      - step: "Calling generate_file must fail"
+        action: "call"
+        target: "exporter"
+        method: "generate_file"
+        expect_error:
+          type: "UserError"
+
+  - name: "generate_file with result not a list raises UserError"
+    steps:
+      - step: "Create exporter whose python_code does not assign a list"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "Non List Exporter"
+          code: "/"
+          python_code: 'result = "not a list"'
+      - step: "Calling generate_file must fail"
+        action: "call"
+        target: "exporter"
+        method: "generate_file"
+        expect_error:
+          type: "UserError"
