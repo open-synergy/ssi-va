@@ -30,6 +30,7 @@ class VAGeneratorSourceData(models.Model):
         string="Source Model",
         comodel_name="ir.model",
         required=True,
+        ondelete="cascade",
         help="Technical model of the source record that Virtual "
         "Account numbers are generated for.",
     )
