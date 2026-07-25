@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 OpenSynergy Indonesia
+     Copyright 2026 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="generate_va_view_form" model="ir.ui.view">
+    <field name="name">generate_va - Form</field>
+    <field name="model">generate_va</field>
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <form string="Generate VA">
+            <sheet>
+                <group name="main" col="2">
+                    <field name="partner_ids" widget="many2many_tags" colspan="2" />
+                    <field name="type_id" />
+                    <field name="biller_id" />
+                    <field name="merchant_id" />
+                </group>
+                <footer>
+                    <button
+                            string="Generate VA"
+                            class="oe_highlight"
+                            type="object"
+                            name="action_generate"
+                        />
+                    <button
+                            string="Cancel"
+                            class="oe_link"
+                            special="cancel"
+                            type="object"
+                        />
+                </footer>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="generate_va_action" model="ir.actions.act_window">
+    <field name="name">Generate VA</field>
+    <field name="res_model">generate_va</field>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="generate_va_view_form" />
+    <field name="target">new</field>
+    <field name="binding_model_id" ref="base.model_res_partner" />
+    <field name="binding_view_types">list,form</field>
+</record>
+</odoo>

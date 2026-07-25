@@ -1,0 +1,262 @@
+options:
+  auto_refresh: true
+
+setup:
+  steps:
+    - step: "Get ir.model record for res.partner"
+      action: "ref"
+      xml_id: "base.model_res_partner"
+      save_as: "model_res_partner"
+
+    - step: "Create bank A"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_a"
+      values:
+        name: "Bank A"
+
+scenarios:
+  - name:
+      "Wizard on a single partner creates one va_generator with one source data line"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Test Partner"
+      - step: "Run wizard on the partner (as if launched from Contact list)"
+        action: "wizard"
+        model: "generate_va"
+        target: "partner"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Assert VA generator values"
+        action: "assert"
+        target: "generator"
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
+          type_id:
+            type: "m2o"
+            expected: "REC: generator_type"
+          biller_id:
+            type: "m2o"
+            expected: "REC: biller"
+      - step: "Find the source data line"
+        action: "search"
+        model: "va_generator.source_data"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "source_line"
+        expect_count: 1
+      - step: "Assert source data line resolves to the partner"
+        action: "assert"
+        target: "source_line"
+        asserts:
+          model_id:
+            type: "m2o"
+            expected: "REC: model_res_partner"
+          res_id:
+            type: "value"
+            expected: "REC: partner.id"
+
+  - name:
+      "Wizard on three selected partners creates one va_generator with three source data
+      lines"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create partner 1"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner_1"
+        values:
+          name: "Test Partner 1"
+      - step: "Create partner 2"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner_2"
+        values:
+          name: "Test Partner 2"
+      - step: "Create partner 3"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner_3"
+        values:
+          name: "Test Partner 3"
+      - step:
+          "Gather the three partners into one recordset (mimics a multi-row list
+          selection)"
+        action: "search"
+        model: "res.partner"
+        domain:
+          - [
+              "id",
+              "in",
+              ["REC: partner_1.id", "REC: partner_2.id", "REC: partner_3.id"],
+            ]
+        save_as: "partners_3"
+        expect_count: 3
+      - step:
+          "Run wizard on all three partners at once (same action as the single-partner
+          case)"
+        action: "wizard"
+        model: "generate_va"
+        target: "partners_3"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+        method: "action_generate"
+      - step: "Exactly one VA generator was created"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Exactly three source data lines were created on it"
+        action: "search"
+        model: "va_generator.source_data"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "source_lines"
+        expect_count: 3
+
+  - name: "Wizard with merchant selected fills the generator's merchant_id"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B1"
+      - step: "Create merchant registered under the biller"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code.id"
+                merchant_code: "M1"
+      - step: "Create partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Test Partner"
+      - step: "Run wizard with biller and merchant selected"
+        action: "wizard"
+        model: "generate_va"
+        target: "partner"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          merchant_id: "REC: merchant.id"
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Assert merchant_id was carried over from the wizard"
+        action: "assert"
+        target: "generator"
+        asserts:
+          merchant_id:
+            type: "m2o"
+            expected: "REC: merchant"
+
+  - name: "Generating with no partner selected is rejected"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create wizard directly (no active_ids context, no partner_ids)"
+        action: "create"
+        model: "generate_va"
+        save_as: "wizard"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+      - step: "action_generate must fail because no partner was selected"
+        action: "call"
+        target: "wizard"
+        method: "action_generate"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+          message_contains: "No partner has been selected"

@@ -36,6 +36,7 @@
         "security/ir_model_access/va_generator_type.xml",
         "security/ir_model_access/va_generator.xml",
         "security/ir_model_access/va_generator_exporter.xml",
+        "security/ir_model_access/generate_va.xml",
         "security/ir_rule/va_generator.xml",
         "ir_sequence/va_generator.xml",
         "sequence_template/va_generator.xml",
@@ -47,6 +48,7 @@
         "views/va_generator_type.xml",
         "views/va_generator.xml",
         "views/va_generator_exporter.xml",
+        "wizards/generate_va.xml",
     ],
     "demo": [],
 }
