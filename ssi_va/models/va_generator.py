@@ -89,6 +89,18 @@ class VAGenerator(models.Model):
         "code appended to the biller/merchant code for every generated "
         "Virtual Account number.",
     )
+    bank_id = fields.Many2one(
+        string="Bank",
+        comodel_name="res.bank",
+        required=True,
+        readonly=True,
+        states={"draft": [("readonly", False)]},
+        help="Bank this generation batch is for. Restricts the "
+        "selectable Biller to those holding a Virtual Account code "
+        "for this bank, and restricts generated Virtual Account bank "
+        "accounts to this bank only, even when the biller/merchant "
+        "also holds codes for other banks.",
+    )
     biller_id = fields.Many2one(
         string="Biller",
         comodel_name="va_biller",
@@ -166,6 +178,14 @@ class VAGenerator(models.Model):
             view_arch = self._reconfigure_statusbar_visible(view_arch)
         return view_arch
 
+    @api.onchange("bank_id")
+    def onchange_biller_id(self):
+        self.biller_id = False
+
+    @api.onchange("bank_id")
+    def onchange_merchant_id(self):
+        self.merchant_id = False
+
     @ssi_decorator.pre_confirm_check()
     def _10_check_source_data(self):
         self.ensure_one()
@@ -179,6 +199,34 @@ Solution: Add at least one source data line before confirming
 """ % (
                 self._description,
                 self.id,
+            )
+            raise UserError(_(error_message))
+
+    @ssi_decorator.pre_confirm_check()
+    def _15_check_biller_bank_id(self):
+        """Ensure the selected biller has a code for the selected bank.
+
+        Raises ``UserError`` when ``biller_id.bank_code_ids`` has no
+        line whose ``bank_id`` matches ``self.bank_id``, since without
+        one no Virtual Account bank account could be generated for
+        that bank when the document reaches done.
+        """
+        self.ensure_one()
+        if not self.biller_id.bank_code_ids.filtered(
+            lambda line: line.bank_id == self.bank_id
+        ):
+            error_message = """
+Document Type: %s
+Context: Confirm document
+Database ID: %s
+Problem: Biller %s has no Virtual Account code registered for bank %s
+Solution: Register a bank code for the biller under the selected \
+bank, or choose a different bank/biller combination
+""" % (
+                self._description,
+                self.id,
+                self.biller_id.name,
+                self.bank_id.name,
             )
             raise UserError(_(error_message))
 
@@ -232,6 +280,7 @@ resolves this source data line into a single res.partner record
         self.ensure_one()
         return self.merchant_id.biller_code_ids.filtered(
             lambda line: line.biller_id.va_biller_id == self.biller_id
+            and line.biller_id.bank_id == self.bank_id
         )
 
     @ssi_decorator.post_done_action()
@@ -277,7 +326,10 @@ resolves this source data line into a single res.partner record
                     }
                 )
         else:
-            for line in self.biller_id.bank_code_ids:
+            bank_code_lines = self.biller_id.bank_code_ids.filtered(
+                lambda code_line: code_line.bank_id == self.bank_id
+            )
+            for line in bank_code_lines:
                 result.append(
                     {
                         "bank": line.bank_id,

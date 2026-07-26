@@ -14,11 +14,17 @@
     <field name="arch" type="xml">
         <data>
             <xpath expr="//field[@name='name']" position="after">
+                <field name="bank_id" />
                 <field name="biller_id" />
                 <field name="merchant_id" />
                 <field name="type_id" />
             </xpath>
             <xpath expr="//group[@name='group_by']" position="inside">
+                <filter
+                        name="grp_bank_id"
+                        string="Bank"
+                        context="{'group_by': 'bank_id'}"
+                    />
                 <filter
                         name="grp_biller_id"
                         string="Biller"
@@ -42,6 +48,7 @@
     <field name="arch" type="xml">
         <data>
             <xpath expr="//field[@name='company_id']" position="after">
+                <field name="bank_id" />
                 <field name="biller_id" />
                 <field name="merchant_id" optional="hide" />
                 <field name="type_id" optional="hide" />
@@ -67,7 +74,11 @@
             </xpath>
             <xpath expr="//group[@name='header_right']" position="inside">
                 <field name="type_id" />
-                <field name="biller_id" />
+                <field name="bank_id" />
+                <field
+                        name="biller_id"
+                        domain="[('bank_code_ids.bank_id', '=', bank_id)]"
+                    />
                 <field name="merchant_id" />
                 <field name="exporter_id" />
             </xpath>

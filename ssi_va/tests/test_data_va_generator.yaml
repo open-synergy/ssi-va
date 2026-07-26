@@ -45,12 +45,21 @@ scenarios:
         values:
           name: "Biller A"
           code: "/"
+      - step: "Create bank code for the biller matching bank_id"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B0"
       - step: "Create VA generator"
         action: "create"
         model: "va_generator"
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Assert created in draft with no sequence number yet"
         action: "assert"
@@ -89,6 +98,7 @@ scenarios:
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Confirm must fail because source data is empty"
         action: "call"
@@ -122,6 +132,14 @@ scenarios:
         values:
           name: "Biller B"
           code: "/"
+      - step: "Create bank code for biller A matching bank_id, so the bank check passes"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_a_code"
+        values:
+          va_biller_id: "REC: biller_a.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "A2"
       - step: "Create bank code for biller B"
         action: "create"
         model: "va_biller.code"
@@ -148,6 +166,7 @@ scenarios:
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller_a.id"
           merchant_id: "REC: merchant.id"
       - step: "Add source data so only the merchant check is exercised"
@@ -164,6 +183,204 @@ scenarios:
         as_user: "base.user_admin"
         expect_error:
           type: "UserError"
+
+  - name: "Confirm is rejected when the biller has no code for the selected bank"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U30"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank B"
+        action: "create"
+        model: "res.bank"
+        save_as: "bank_b"
+        values:
+          name: "Bank B"
+      - step: "Create bank code for the biller, but only for bank B"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_b.id"
+          biller_code: "B30"
+      - step: "Create VA generator for bank A, which the biller has no code for"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm must fail because the biller has no code for bank A"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+
+  - name:
+      "Confirm is rejected when the merchant only has a code for a different
+      bank than the one selected on the document"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U31"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank B"
+        action: "create"
+        model: "res.bank"
+        save_as: "bank_b"
+        values:
+          name: "Bank B"
+      - step: "Create bank code for the biller at bank A"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code_a"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "BA31"
+      - step: "Create bank code for the biller at bank B"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code_b"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_b.id"
+          biller_code: "BB31"
+      - step: "Create merchant registered only for the biller's bank B code"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code_b.id"
+                merchant_code: "M31"
+      - step:
+          "Create VA generator for the same biller, but for bank A (merchant
+          has no code there)"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+          merchant_id: "REC: merchant.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step:
+          "Confirm must fail because the merchant has no code for bank A,
+          even though it is the same biller"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+
+  - name: "Changing bank_id on the form resets biller_id and merchant_id"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank B"
+        action: "create"
+        model: "res.bank"
+        save_as: "bank_b"
+        values:
+          name: "Bank B"
+      - step: "Create bank code for the biller at bank A"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B32"
+      - step: "Create merchant registered under the biller's bank A code"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code.id"
+                merchant_code: "M32"
+      - step:
+          "Fill the form with bank_id/biller_id/merchant_id, then switch
+          bank_id to bank B"
+        action: "form"
+        model: "va_generator"
+        save: false
+        ops:
+          - set: { type_id: "REC: generator_type" }
+          - set: { bank_id: "REC: bank_a" }
+          - set: { biller_id: "REC: biller" }
+          - set: { merchant_id: "REC: merchant" }
+          - set: { bank_id: "REC: bank_b" }
+          - assert:
+              biller_id:
+                type: "value"
+                operator: "is_falsy"
+              merchant_id:
+                type: "value"
+                operator: "is_falsy"
 
   - name: "Full workflow generates bank account at biller level"
     steps:
@@ -197,6 +414,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -252,6 +470,101 @@ scenarios:
             type: "m2o"
             expected: "REC: generator"
 
+  - name:
+      "Full workflow at biller level generates exactly one bank account for
+      the selected bank, even when the biller has codes for other banks too"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U40"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank B"
+        action: "create"
+        model: "res.bank"
+        save_as: "bank_b"
+        values:
+          name: "Bank B"
+      - step: "Create bank code for the biller at bank A"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code_a"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "BA40"
+      - step: "Create bank code for the biller at bank B too"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code_b"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_b.id"
+          biller_code: "BB40"
+      - step: "Create VA generator without merchant, for bank A"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step:
+          "Exactly one bank account is generated, not one per bank code
+          held by the biller"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "bank_account"
+        expect_count: 1
+      - step: "Assert the generated bank account uses the bank A code"
+        action: "assert"
+        target: "bank_account"
+        asserts:
+          acc_number:
+            type: "value"
+            expected: "BA40U40"
+          bank_id:
+            type: "m2o"
+            expected: "REC: bank_a"
+
   - name: "Full workflow generates bank account at merchant level"
     steps:
       - step: "Create generator type"
@@ -296,6 +609,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           merchant_id: "REC: merchant.id"
       - step: "Add source data for the partner"
@@ -342,6 +656,122 @@ scenarios:
             expected: "REC: partner"
 
   - name:
+      "Full workflow at merchant level uses only the merchant code matching
+      the selected bank, even when the merchant has codes at another bank too"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U41"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank B"
+        action: "create"
+        model: "res.bank"
+        save_as: "bank_b"
+        values:
+          name: "Bank B"
+      - step: "Create bank code for the biller at bank A"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code_a"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "BA41"
+      - step: "Create bank code for the biller at bank B"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code_b"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_b.id"
+          biller_code: "BB41"
+      - step:
+          "Create merchant with a code registered under both bank codes of
+          the biller"
+        action: "create"
+        model: "va_biller_merchant"
+        save_as: "merchant"
+        values:
+          name: "Merchant A"
+          code: "/"
+          biller_code_ids:
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code_a.id"
+                merchant_code: "MA41"
+            - - 0
+              - 0
+              - biller_id: "REC: biller_code_b.id"
+                merchant_code: "MB41"
+      - step: "Create VA generator with the merchant, selecting bank B"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_b.id"
+          biller_id: "REC: biller.id"
+          merchant_id: "REC: merchant.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step:
+          "Exactly one bank account is generated, not one per merchant code
+          line"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "bank_account"
+        expect_count: 1
+      - step:
+          "Assert the generated bank account uses the bank B merchant
+          code, not the bank A one"
+        action: "assert"
+        target: "bank_account"
+        asserts:
+          acc_number:
+            type: "value"
+            expected: "BB41MB41U41"
+          bank_id:
+            type: "m2o"
+            expected: "REC: bank_b"
+
+  - name:
       "Full workflow propagates generator type usage_id to the generated bank account"
     steps:
       - step: "Create bank account usage"
@@ -382,6 +812,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -457,6 +888,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -521,6 +953,7 @@ scenarios:
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add first source data line for the partner"
         action: "create"
@@ -573,6 +1006,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -666,6 +1100,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -737,6 +1172,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -822,6 +1258,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           exporter_id: "REC: exporter.id"
       - step: "Add source data for the partner"
@@ -933,6 +1370,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           exporter_id: "REC: exporter.id"
       - step: "Add source data for the partner"
@@ -1014,6 +1452,7 @@ scenarios:
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           exporter_id: "REC: exporter.id"
       - step: "Calling the action on a draft document must fail"
@@ -1056,6 +1495,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -1129,6 +1569,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data referencing the admin user (res.users), not a partner"
         action: "create"
@@ -1214,6 +1655,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data referencing the admin user (res.users)"
         action: "create"
@@ -1275,12 +1717,21 @@ scenarios:
         values:
           name: "Biller A"
           code: "/"
+      - step: "Create bank code for the biller, so only the partner check is exercised"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B22"
       - step: "Create VA generator"
         action: "create"
         model: "va_generator"
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
@@ -1322,12 +1773,21 @@ scenarios:
         values:
           name: "Biller A"
           code: "/"
+      - step: "Create bank code for the biller, so only the partner check is exercised"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B23"
       - step: "Create VA generator"
         action: "create"
         model: "va_generator"
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data referencing the admin user (res.users)"
         action: "create"
@@ -1362,12 +1822,21 @@ scenarios:
         values:
           name: "Biller A"
           code: "/"
+      - step: "Create bank code for the biller, so only the partner check is exercised"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B24"
       - step: "Create VA generator"
         action: "create"
         model: "va_generator"
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "Add source data for the partner"
         action: "create"
