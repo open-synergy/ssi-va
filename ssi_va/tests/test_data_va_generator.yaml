@@ -501,6 +501,7 @@ scenarios:
         action: "create"
         model: "va_generator"
         save_as: "generator"
+        as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type.id"
           biller_id: "REC: biller.id"
