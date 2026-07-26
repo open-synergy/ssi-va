@@ -1255,7 +1255,7 @@ scenarios:
         asserts:
           acc_number:
             type: "value"
-            expected: 'EVAL: "B21SRC" + str(registry["admin_user"].id)'
+            expected: 'EVAL: "B21SRC%s" % registry["admin_user"].id'
 
   - name: "Confirm is rejected when partner_python_code resolves to False"
     steps:
