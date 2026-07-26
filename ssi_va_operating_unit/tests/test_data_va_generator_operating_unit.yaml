@@ -1,6 +1,15 @@
 options:
   auto_refresh: true
 
+setup:
+  steps:
+    - step: "Create bank A"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_a"
+      values:
+        name: "Bank A"
+
 scenarios:
   - name: "va_generator created directly with operating_unit_id keeps the value"
     steps:
@@ -33,6 +42,7 @@ scenarios:
         save_as: "generator"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           operating_unit_id: "REC: ou.id"
       - step: "Assert operating_unit_id was stored"
@@ -82,6 +92,7 @@ scenarios:
         target: "partner"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           operating_unit_id: "REC: ou.id"
         method: "action_generate"
@@ -133,6 +144,7 @@ scenarios:
         target: "partner"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           operating_unit_id: false
         method: "action_generate"
