@@ -204,6 +204,30 @@ biller level only
             )
             raise UserError(_(error_message))
 
+    @ssi_decorator.pre_confirm_check()
+    def _30_check_partner(self):
+        self.ensure_one()
+        for source in self.source_data_ids:
+            try:
+                self.type_id.generate_partner(
+                    extra_localdict=self._get_partner_localdict(source)
+                )
+            except Exception as error:
+                error_message = """
+Document Type: %s
+Context: Confirm document
+Database ID: %s
+Problem: Source data %s could not be resolved into a res.partner record: %s
+Solution: Fix the generator type's partner resolution Python code so it \
+resolves this source data line into a single res.partner record
+""" % (
+                    self._description,
+                    self.id,
+                    source.display_name,
+                    error,
+                )
+                raise UserError(_(error_message))
+
     def _get_merchant_biller_code_lines(self):
         self.ensure_one()
         return self.merchant_id.biller_code_ids.filtered(
@@ -224,22 +248,21 @@ biller level only
         self.ensure_one()
         schema_lines = self._get_bank_schema_lines()
         for source in self.source_data_ids:
-            if source.model_name != "res.partner":
-                error_message = """
-Document Type: %s
-Context: Generate Virtual Account
-Database ID: %s
-Problem: Source data %s is not a res.partner record
-Solution: Only res.partner source data is supported at the moment
-""" % (
-                    self._description,
-                    self.id,
-                    source.display_name,
-                )
-                raise UserError(_(error_message))
-            partner = self.env[source.model_name].browse(source.res_id)
+            partner = self.type_id.generate_partner(
+                extra_localdict=self._get_partner_localdict(source)
+            )
             for schema in schema_lines:
-                self._create_bank_account(partner, schema)
+                self._create_bank_account(source, partner, schema)
+
+    def _get_partner_localdict(self, source):
+        self.ensure_one()
+        return {
+            "generator": self,
+            "source_data": source,
+            "source_record": source.source_data_id,
+            "biller": self.biller_id,
+            "merchant": self.merchant_id,
+        }
 
     def _get_bank_schema_lines(self):
         self.ensure_one()
@@ -264,7 +287,7 @@ Solution: Only res.partner source data is supported at the moment
                 )
         return result
 
-    def _create_bank_account(self, partner, schema):
+    def _create_bank_account(self, source_data, partner, schema):
         self.ensure_one()
         unique_code = self.type_id.generate_code(
             extra_localdict={
@@ -272,7 +295,8 @@ Solution: Only res.partner source data is supported at the moment
                 "merchant": self.merchant_id,
                 "bank": schema["bank"],
                 "partner": partner,
-                "source_record": partner,
+                "source_data": source_data,
+                "source_record": source_data.source_data_id,
             }
         )
         acc_number = "%s%s%s" % (

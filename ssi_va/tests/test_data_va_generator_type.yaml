@@ -156,3 +156,78 @@ scenarios:
         method: "generate_code"
         expect_error:
           type: "UserError"
+
+  - name: "Create va_generator_type with default partner_python_code"
+    steps:
+      - step: "Create generator type without specifying partner_python_code"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "ABC123"'
+      - step: "Assert partner_python_code default value"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          partner_python_code:
+            type: "value"
+            expected: "result = source_data.source_data_id"
+
+  - name: "generate_partner with invalid partner_python_code raises UserError"
+    steps:
+      - step: "Create generator type with invalid partner_python_code"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Broken Partner Resolver"
+          code: "/"
+          python_code: 'result = "ABC123"'
+          partner_python_code: "result = undefined_variable"
+      - step: "Calling generate_partner must fail"
+        action: "call"
+        target: "generator_type"
+        method: "generate_partner"
+        expect_error:
+          type: "UserError"
+
+  - name: "generate_partner with partner_python_code returning False raises UserError"
+    steps:
+      - step: "Create generator type whose partner_python_code returns False"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Falsy Partner Resolver"
+          code: "/"
+          python_code: 'result = "ABC123"'
+          partner_python_code: "result = False"
+      - step: "Calling generate_partner must fail"
+        action: "call"
+        target: "generator_type"
+        method: "generate_partner"
+        expect_error:
+          type: "UserError"
+
+  - name:
+      "generate_partner with partner_python_code returning a non-partner record raises
+      UserError"
+    steps:
+      - step:
+          "Create generator type whose partner_python_code returns a res.users record"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Wrong Model Partner Resolver"
+          code: "/"
+          python_code: 'result = "ABC123"'
+          partner_python_code: "result = env.user"
+      - step: "Calling generate_partner must fail"
+        action: "call"
+        target: "generator_type"
+        method: "generate_partner"
+        expect_error:
+          type: "UserError"
