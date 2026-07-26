@@ -1,0 +1,147 @@
+options:
+  auto_refresh: true
+
+setup:
+  steps:
+    - step: "Create operating unit A"
+      action: "create"
+      model: "operating.unit"
+      save_as: "ou_a"
+      values:
+        name: "VA OU Test A"
+        code: "VA-OU-A"
+        partner_id: "base.main_partner"
+
+scenarios:
+  - name: "va_generator created directly with operating_unit_id keeps the value"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller Direct OU"
+          code: "/"
+      - step: "Create va_generator with operating_unit_id set"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          operating_unit_id: "REC: ou_a.id"
+      - step: "Assert operating_unit_id was stored"
+        action: "assert"
+        target: "generator"
+        asserts:
+          operating_unit_id:
+            type: "m2o"
+            expected: "REC: ou_a"
+
+  - name:
+      "generate_va wizard with operating_unit_id explicitly filled passes it through to
+      the created va_generator"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller Wizard OU Filled"
+          code: "/"
+      - step: "Create partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Test Partner Wizard OU Filled"
+      - step: "Run wizard with operating_unit_id explicitly filled"
+        action: "wizard"
+        model: "generate_va"
+        target: "partner"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          operating_unit_id: "REC: ou_a.id"
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Assert operating_unit_id was carried over from the wizard"
+        action: "assert"
+        target: "generator"
+        asserts:
+          operating_unit_id:
+            type: "m2o"
+            expected: "REC: ou_a"
+
+  - name:
+      "generate_va wizard without operating_unit_id filled does not error and creates a
+      va_generator with an empty operating_unit_id"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller Wizard OU Empty"
+          code: "/"
+      - step: "Create partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Test Partner Wizard OU Empty"
+      - step:
+          "Run wizard leaving operating_unit_id empty (explicit false — same value the
+          web client submits when the user clears the field)"
+        action: "wizard"
+        model: "generate_va"
+        target: "partner"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          operating_unit_id: false
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Assert operating_unit_id is empty"
+        action: "assert"
+        target: "generator"
+        asserts:
+          operating_unit_id:
+            type: "value"
+            operator: "is_falsy"
