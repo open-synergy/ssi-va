@@ -57,10 +57,19 @@
     <field name="mode">primary</field>
     <field name="arch" type="xml">
         <data>
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button
+                        name="action_generate_export_file"
+                        string="Generate Export File"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'done')]}"
+                    />
+            </xpath>
             <xpath expr="//group[@name='header_right']" position="inside">
                 <field name="type_id" />
                 <field name="biller_id" />
                 <field name="merchant_id" />
+                <field name="exporter_id" />
             </xpath>
             <xpath expr="//page[1]" position="before">
                 <page name="source_data" string="Source Data">

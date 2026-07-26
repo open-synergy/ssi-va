@@ -775,3 +775,312 @@ scenarios:
           - ["va_generator_id", "=", "REC: generator.id"]
         save_as: "remaining_bank_account"
         expect_count: 0
+
+  - name: "Generate export file button creates a new attachment on every click (CSV)"
+    steps:
+      - step: "Create CSV exporter"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "CSV Exporter"
+          code: "/"
+          format: "csv"
+          python_code: 'result = [["VA"]]'
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B1"
+      - step: "Create VA generator with exporter already set"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          exporter_id: "REC: exporter.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "No export attachment exists yet before clicking the button"
+        action: "search"
+        model: "ir.attachment"
+        domain:
+          - ["res_model", "=", "va_generator"]
+          - ["res_id", "=", "REC: generator.id"]
+        save_as: "no_attachment_yet"
+        expect_count: 0
+      - step: "Click the Generate Export File button"
+        action: "call"
+        target: "generator"
+        method: "action_generate_export_file"
+        as_user: "base.user_admin"
+      - step: "Exactly one export attachment now exists"
+        action: "search"
+        model: "ir.attachment"
+        domain:
+          - ["res_model", "=", "va_generator"]
+          - ["res_id", "=", "REC: generator.id"]
+        save_as: "first_attachment"
+        expect_count: 1
+      - step: "Attachment name uses the CSV extension"
+        action: "assert"
+        target: "first_attachment"
+        asserts:
+          name:
+            type: "value"
+            operator: "contains"
+            expected: ".csv"
+      - step: "Click the Generate Export File button a second time"
+        action: "call"
+        target: "generator"
+        method: "action_generate_export_file"
+        as_user: "base.user_admin"
+      - step: "A second export attachment was added, not overwritten"
+        action: "search"
+        model: "ir.attachment"
+        domain:
+          - ["res_model", "=", "va_generator"]
+          - ["res_id", "=", "REC: generator.id"]
+        save_as: "both_attachments"
+        expect_count: 2
+
+  - name: "Generate export file uses the exporter format extension (XLSX)"
+    steps:
+      - step: "Create XLSX exporter"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "XLSX Exporter"
+          code: "/"
+          format: "xlsx"
+          python_code: 'result = [["VA"]]'
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U2"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B2"
+      - step: "Create VA generator with exporter already set"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          exporter_id: "REC: exporter.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "Click the Generate Export File button"
+        action: "call"
+        target: "generator"
+        method: "action_generate_export_file"
+        as_user: "base.user_admin"
+      - step: "Exactly one export attachment now exists"
+        action: "search"
+        model: "ir.attachment"
+        domain:
+          - ["res_model", "=", "va_generator"]
+          - ["res_id", "=", "REC: generator.id"]
+        save_as: "xlsx_attachment"
+        expect_count: 1
+      - step: "Attachment name uses the XLSX extension"
+        action: "assert"
+        target: "xlsx_attachment"
+        asserts:
+          name:
+            type: "value"
+            operator: "contains"
+            expected: ".xlsx"
+
+  - name: "Generate export file is rejected when the document is not done"
+    steps:
+      - step: "Create CSV exporter"
+        action: "create"
+        model: "va_generator_exporter"
+        save_as: "exporter"
+        values:
+          name: "CSV Exporter"
+          code: "/"
+          format: "csv"
+          python_code: 'result = [["VA"]]'
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U3"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create VA generator in draft with exporter already set"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+          exporter_id: "REC: exporter.id"
+      - step: "Calling the action on a draft document must fail"
+        action: "call"
+        target: "generator"
+        method: "action_generate_export_file"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+
+  - name: "Generate export file is rejected when no exporter is selected"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U4"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B4"
+      - step: "Create VA generator without exporter"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "Calling the action without an exporter must fail"
+        action: "call"
+        target: "generator"
+        method: "action_generate_export_file"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
