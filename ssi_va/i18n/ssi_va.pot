@@ -157,6 +157,11 @@ msgid "Bank"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__usage_id
+msgid "Bank Account Usage"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model,name:ssi_va.model_res_partner_bank
 msgid "Bank Accounts"
 msgstr ""
@@ -1070,6 +1075,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_exporter__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__message_unread_counter
 msgid "Unread Messages Counter"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_type__usage_id
+msgid ""
+"Usage/purpose copied to every res.partner.bank generated through this "
+"generator type. Optional - left empty, generated bank accounts are created "
+"with no usage set."
 msgstr ""
 
 #. module: ssi_va
