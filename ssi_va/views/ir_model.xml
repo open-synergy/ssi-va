@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 OpenSynergy Indonesia
+     Copyright 2026 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="view_model_form" model="ir.ui.view">
+    <field name="name">ir.model - Form - Add Generate VA Wizard</field>
+    <field name="model">ir.model</field>
+    <field name="inherit_id" ref="base.view_model_form" />
+    <field name="arch" type="xml">
+        <xpath expr="//sheet" position="before">
+            <header>
+                <button
+                        string="Add Generate VA Wizard"
+                        type="object"
+                        name="action_create_va_wizard"
+                        groups="base.group_system"
+                    />
+            </header>
+        </xpath>
+    </field>
+</record>
+</odoo>
