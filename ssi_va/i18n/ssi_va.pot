@@ -156,8 +156,11 @@ msgid "Attachment Count"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__bank_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__bank_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_merchant_code__bank_id
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__bank_id
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_search
 msgid "Bank"
 msgstr ""
 
@@ -187,6 +190,24 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_biller_code__bank_id
 msgid "Bank that issued the biller code for this Virtual Account."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_generate_va__bank_id
+msgid ""
+"Bank the generated Virtual Account numbers are for. Restricts the selectable"
+" Biller to those holding a Virtual Account code for this bank, and is "
+"carried over to the resulting va_generator document, which in turn restricts"
+" the generated Virtual Account bank accounts to this bank only."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__bank_id
+msgid ""
+"Bank this generation batch is for. Restricts the selectable Biller to those "
+"holding a Virtual Account code for this bank, and restricts generated "
+"Virtual Account bank accounts to this bank only, even when the "
+"biller/merchant also holds codes for other banks."
 msgstr ""
 
 #. module: ssi_va
