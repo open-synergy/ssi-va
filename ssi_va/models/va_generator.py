@@ -198,6 +198,11 @@ biller level only
         self.ensure_one()
         self._done()
 
+    @ssi_decorator.post_cancel_action()
+    def _10_delete_bank_account(self):
+        self.ensure_one()
+        self.bank_account_ids.unlink()
+
     def _done(self):
         self.ensure_one()
         schema_lines = self._get_bank_schema_lines()
