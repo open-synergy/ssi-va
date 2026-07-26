@@ -52,6 +52,16 @@
                             options="{'mode': 'python'}"
                         />
                 </page>
+                <page
+                        name="partner_python_code"
+                        string="Partner Resolution Python Code"
+                    >
+                    <field
+                            name="partner_python_code"
+                            widget="ace"
+                            options="{'mode': 'python'}"
+                        />
+                </page>
             </xpath>
         </data>
     </field>

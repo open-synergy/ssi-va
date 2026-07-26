@@ -46,6 +46,71 @@ class VAGeneratorType(models.Model):
         "through this generator type. Optional - left empty, generated "
         "bank accounts are created with no usage set.",
     )
+    partner_python_code = fields.Text(
+        string="Partner Resolution Python Code",
+        required=True,
+        default="result = source_data.source_data_id",
+        help="Python code executed via safe_eval to resolve the res.partner "
+        "record Virtual Account numbers are generated for, out of the "
+        "current source data line ('source_data', a va_generator."
+        "source_data record). The code must assign the resulting record "
+        "(exactly one res.partner) to the variable 'result'.",
+    )
+
+    def generate_partner(self, extra_localdict=None):
+        """Execute ``partner_python_code`` and return the resolved partner.
+
+        ``extra_localdict`` is merged into the evaluation context before
+        executing ``partner_python_code``. It is the extension point
+        ``va_generator`` uses to expose the current generator document and
+        source data line (e.g. ``generator``, ``source_data``,
+        ``source_record``, ``biller``, ``merchant``) to the code.
+        """
+        self.ensure_one()
+        localdict = self._get_default_localdict()
+        localdict.update(extra_localdict or {})
+        try:
+            safe_eval(
+                self.partner_python_code,
+                localdict,
+                mode="exec",
+                nocopy=True,
+            )
+            result = localdict["result"]
+        except Exception as error:
+            error_message = """
+Document Type: %s
+Context: Resolve source partner
+Database ID: %s
+Problem: Execution of partner_python_code failed with error: %s
+Solution: Fix partner_python_code so it assigns a single res.partner \
+record to the 'result' variable
+""" % (
+                self._description,
+                self.id,
+                error,
+            )
+            raise UserError(_(error_message))
+        if (
+            not isinstance(result, models.BaseModel)
+            or result._name != "res.partner"
+            or len(result) != 1
+        ):
+            error_message = """
+Document Type: %s
+Context: Resolve source partner
+Database ID: %s
+Problem: partner_python_code did not return a single res.partner record \
+(got: %s)
+Solution: Fix partner_python_code so it assigns exactly one res.partner \
+record to the 'result' variable
+""" % (
+                self._description,
+                self.id,
+                result,
+            )
+            raise UserError(_(error_message))
+        return result
 
     def generate_code(self, extra_localdict=None):
         """Execute ``python_code`` and return the generated VA code.
