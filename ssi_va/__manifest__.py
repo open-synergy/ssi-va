@@ -49,6 +49,7 @@
         "views/va_generator_type.xml",
         "views/va_generator.xml",
         "views/va_generator_exporter.xml",
+        "views/ir_model.xml",
         "wizards/generate_va.xml",
     ],
     "demo": [],

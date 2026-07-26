@@ -11,3 +11,4 @@ from . import va_generator
 from . import va_generator_source_data
 from . import va_generator_exporter
 from . import res_partner_bank
+from . import ir_model

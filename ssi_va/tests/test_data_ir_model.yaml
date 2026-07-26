@@ -1,0 +1,177 @@
+options:
+  auto_refresh: true
+
+scenarios:
+  - name: "Pressing the button once on res.users creates one binding"
+    steps:
+      - step: "Get ir.model record for res.users"
+        action: "ref"
+        xml_id: "base.model_res_users"
+        save_as: "model_res_users"
+      - step: "Press Add Generate VA Wizard on res.users"
+        action: "call"
+        target: "model_res_users"
+        method: "action_create_va_wizard"
+      - step: "Exactly one Generate VA binding exists for res.users"
+        action: "search"
+        model: "ir.actions.act_window"
+        domain:
+          - ["res_model", "=", "generate_va"]
+          - ["binding_model_id", "=", "REC: model_res_users.id"]
+        save_as: "binding"
+        expect_count: 1
+      - step: "Assert the binding action values"
+        action: "assert"
+        target: "binding"
+        asserts:
+          name:
+            type: "value"
+            expected: "Generate VA"
+          res_model:
+            type: "value"
+            expected: "generate_va"
+          view_mode:
+            type: "value"
+            expected: "form"
+          target:
+            type: "value"
+            expected: "new"
+          binding_view_types:
+            type: "value"
+            expected: "list,form"
+
+  - name:
+      "Pressing the button twice on the same model registers two separately named
+      bindings"
+    steps:
+      - step: "Get ir.model record for res.groups"
+        action: "ref"
+        xml_id: "base.model_res_groups"
+        save_as: "model_res_groups"
+      - step: "Press the button a first time"
+        action: "call"
+        target: "model_res_groups"
+        method: "action_create_va_wizard"
+      - step: "Press the button a second time"
+        action: "call"
+        target: "model_res_groups"
+        method: "action_create_va_wizard"
+      - step: "Two Generate VA bindings now exist for res.groups"
+        action: "search"
+        model: "ir.actions.act_window"
+        domain:
+          - ["res_model", "=", "generate_va"]
+          - ["binding_model_id", "=", "REC: model_res_groups.id"]
+        save_as: "bindings"
+        expect_count: 2
+      - step: "The first binding is named plainly"
+        action: "search"
+        model: "ir.actions.act_window"
+        domain:
+          - ["res_model", "=", "generate_va"]
+          - ["binding_model_id", "=", "REC: model_res_groups.id"]
+          - ["name", "=", "Generate VA"]
+        save_as: "first_binding"
+        expect_count: 1
+      - step: "The second binding is named distinctly"
+        action: "search"
+        model: "ir.actions.act_window"
+        domain:
+          - ["res_model", "=", "generate_va"]
+          - ["binding_model_id", "=", "REC: model_res_groups.id"]
+          - ["name", "=", "Generate VA #2"]
+        save_as: "second_binding"
+        expect_count: 1
+
+  - name:
+      "After the binding is added on res.users, launching the wizard on a res.users
+      record still generates a VA sourced from that model"
+    steps:
+      - step: "Get ir.model record for res.users"
+        action: "ref"
+        xml_id: "base.model_res_users"
+        save_as: "model_res_users"
+      - step: "Register the binding on res.users"
+        action: "call"
+        target: "model_res_users"
+        method: "action_create_va_wizard"
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Get admin user as the source record"
+        action: "ref"
+        xml_id: "base.user_admin"
+        save_as: "user_admin"
+      - step: "Run the Generate VA wizard on the admin user"
+        action: "wizard"
+        model: "generate_va"
+        target: "user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Find the source data line"
+        action: "search"
+        model: "va_generator.source_data"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "source_line"
+        expect_count: 1
+      - step: "Assert the source data line resolves to res.users"
+        action: "assert"
+        target: "source_line"
+        asserts:
+          model_id:
+            type: "m2o"
+            expected: "REC: model_res_users"
+          model_name:
+            type: "value"
+            expected: "res.users"
+          res_id:
+            type: "value"
+            expected: "REC: user_admin.id"
+
+  - name: "Pressing the button on a transient model is rejected and creates no binding"
+    steps:
+      - step: "Get ir.model record for the (transient) generate_va wizard"
+        action: "search"
+        model: "ir.model"
+        domain:
+          - ["model", "=", "generate_va"]
+        save_as: "model_generate_va"
+        expect_count: 1
+      - step: "Pressing the button on a transient model must fail"
+        action: "call"
+        target: "model_generate_va"
+        method: "action_create_va_wizard"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+          message_contains: "is a transient model"
+      - step: "No binding was created for the transient model"
+        action: "search"
+        model: "ir.actions.act_window"
+        domain:
+          - ["res_model", "=", "generate_va"]
+          - ["binding_model_id", "=", "REC: model_generate_va.id"]
+        save_as: "no_binding"
+        expect_count: 0
