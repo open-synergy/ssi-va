@@ -25,6 +25,7 @@ class TestGenerateVA(YamlTransactionCase):
             }
         )
         biller = self.env["va_biller"].create({"name": "Biller A", "code": "/"})
+        bank = self.env["res.bank"].create({"name": "Bank A"})
         partner = self.env["res.partner"].create({"name": "Test Partner"})
         wizard = (
             self.env["generate_va"]
@@ -32,6 +33,7 @@ class TestGenerateVA(YamlTransactionCase):
             .create(
                 {
                     "type_id": generator_type.id,
+                    "bank_id": bank.id,
                     "biller_id": biller.id,
                 }
             )

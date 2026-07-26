@@ -1,6 +1,15 @@
 options:
   auto_refresh: true
 
+setup:
+  steps:
+    - step: "Create bank A"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_a"
+      values:
+        name: "Bank A"
+
 scenarios:
   - name: "Pressing the button once on res.users creates one binding"
     steps:
@@ -120,6 +129,7 @@ scenarios:
         target: "user_admin"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
         method: "action_generate"
       - step: "Find the created VA generator"

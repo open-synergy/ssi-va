@@ -52,12 +52,21 @@ class TestVAGenerator(YamlTransactionCase):
                 "code": "/",
             }
         )
+        bank = self.env["res.bank"].create({"name": "Bank Regex"})
+        self.env["va_biller.code"].create(
+            {
+                "va_biller_id": biller.id,
+                "bank_id": bank.id,
+                "biller_code": "BR1",
+            }
+        )
         generator = (
             self.env["va_generator"]
             .with_user(admin_user)
             .create(
                 {
                     "type_id": generator_type.id,
+                    "bank_id": bank.id,
                     "biller_id": biller.id,
                     "exporter_id": exporter.id,
                 }

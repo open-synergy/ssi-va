@@ -12,6 +12,7 @@
             <sheet>
                 <group name="main" col="2">
                     <field name="type_id" />
+                    <field name="bank_id" />
                     <field name="biller_id" />
                     <field name="merchant_id" />
                 </group>
