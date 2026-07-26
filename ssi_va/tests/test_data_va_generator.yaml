@@ -378,3 +378,242 @@ scenarios:
           va_generator_id: "REC: generator.id"
           model_id: "REC: model_res_partner.id"
           res_id: "REC: partner.id"
+
+  - name: "Cancelling from done deletes the generated bank account"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B1"
+      - step: "Create VA generator without merchant"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "Find generated bank account"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "bank_account"
+        expect_count: 1
+      - step: "Create a cancel reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "reason"
+        values:
+          name: "Test VA Generator Cancel Reason"
+          code: "/"
+      - step: "Cancel through the reason wizard as validator"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "generator"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: reason"
+        method: "action_confirm"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+      - step: "The generated bank account is gone from bank_account_ids"
+        action: "assert"
+        target: "generator"
+        refresh: true
+        asserts:
+          bank_account_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 0
+      - step: "No res.partner.bank record referencing the generator remains"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "remaining_bank_account"
+        expect_count: 0
+
+  - name: "Cancelling from draft is a no-op that succeeds without error"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create VA generator"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Assert generator is still in draft, with no bank account yet"
+        action: "assert"
+        target: "generator"
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
+          bank_account_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 0
+      - step: "Create a cancel reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "reason"
+        values:
+          name: "Test VA Generator Cancel Reason (draft)"
+          code: "/"
+      - step: "Cancel from draft through the reason wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "generator"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: reason"
+        method: "action_confirm"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+
+  - name: "Cancelling from confirm succeeds without error and creates no bank account"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B1"
+      - step: "Create VA generator"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Create a cancel reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "reason"
+        values:
+          name: "Test VA Generator Cancel Reason (confirm)"
+          code: "/"
+      - step: "Cancel from confirm through the reason wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "generator"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: reason"
+        method: "action_confirm"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+      - step: "No res.partner.bank record was ever created for the generator"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "remaining_bank_account"
+        expect_count: 0
