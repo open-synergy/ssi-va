@@ -20,6 +20,7 @@
         "ssi_transaction_done_mixin",
         "ssi_transaction_cancel_mixin",
         "ssi_financial_accounting",
+        "ssi_partner",
     ],
     "external_dependencies": {
         "python": ["xlsxwriter"],

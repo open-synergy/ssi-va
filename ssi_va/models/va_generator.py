@@ -274,4 +274,5 @@ Solution: Only res.partner source data is supported at the moment
             "bank_id": bank.id,
             "acc_number": acc_number,
             "va_generator_id": self.id,
+            "usage_id": self.type_id.usage_id.id,
         }

@@ -37,6 +37,15 @@ class VAGeneratorType(models.Model):
         "when run from this model. Left empty, it is available for all "
         "models.",
     )
+    usage_id = fields.Many2one(
+        string="Bank Account Usage",
+        comodel_name="res_partner_bank_usage",
+        required=False,
+        ondelete="restrict",
+        help="Usage/purpose copied to every res.partner.bank generated "
+        "through this generator type. Optional - left empty, generated "
+        "bank accounts are created with no usage set.",
+    )
 
     def generate_code(self, extra_localdict=None):
         """Execute ``python_code`` and return the generated VA code.

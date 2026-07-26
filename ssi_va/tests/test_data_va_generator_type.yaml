@@ -84,6 +84,62 @@ scenarios:
             type: "value"
             operator: "is_falsy"
 
+  - name: "Create va_generator_type with usage_id"
+    steps:
+      - step: "Create bank account usage"
+        action: "create"
+        model: "res_partner_bank_usage"
+        save_as: "usage"
+        values:
+          name: "Invoice Collection"
+          code: "/"
+      - step: "Create generator type with usage_id"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "ABC123"'
+          usage_id: "REC: usage.id"
+      - step: "Assert usage_id refers to the created usage"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          usage_id:
+            type: "m2o"
+            expected: "REC: usage"
+      - step: "Write usage_id to empty"
+        action: "write"
+        target: "generator_type"
+        values:
+          usage_id: false
+      - step: "Assert usage_id is empty"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          usage_id:
+            type: "value"
+            operator: "is_falsy"
+
+  - name: "Create va_generator_type without usage_id"
+    steps:
+      - step: "Create generator type without usage_id"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "ABC123"'
+      - step: "Assert usage_id is empty"
+        action: "assert"
+        target: "generator_type"
+        asserts:
+          usage_id:
+            type: "value"
+            operator: "is_falsy"
+
   - name: "generate_code with invalid python_code raises UserError"
     steps:
       - step: "Create generator type with invalid python_code"
