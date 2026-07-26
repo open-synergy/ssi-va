@@ -891,6 +891,12 @@ msgid ""
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__partner_python_code
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_type_view_form
+msgid "Partner Resolution Python Code"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_generate_va__partner_ids
 msgid "Partners"
 msgstr ""
@@ -931,6 +937,15 @@ msgstr ""
 msgid ""
 "Python code executed via safe_eval to compute the unique VA code. The code "
 "must assign the resulting code (a string) to the variable 'result'."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator_type__partner_python_code
+msgid ""
+"Python code executed via safe_eval to resolve the res.partner record Virtual"
+" Account numbers are generated for, out of the current source data line "
+"('source_data', a va_generator.source_data record). The code must assign the"
+" resulting record (exactly one res.partner) to the variable 'result'."
 msgstr ""
 
 #. module: ssi_va
