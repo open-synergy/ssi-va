@@ -104,6 +104,11 @@ msgid "Activity Type Icon"
 msgstr ""
 
 #. module: ssi_va
+#: model_terms:ir.ui.view,arch_db:ssi_va.view_model_form
+msgid "Add Generate VA Wizard"
+msgstr ""
+
+#. module: ssi_va
 #: model:res.groups,name:ssi_va.va_generator_all_group
 msgid "All"
 msgstr ""
@@ -405,6 +410,7 @@ msgstr ""
 
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_generate_va__display_name
+#: model:ir.model.fields,field_description:ssi_va.field_ir_model__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__display_name
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__display_name
@@ -490,11 +496,18 @@ msgid "Generate Export File"
 msgstr ""
 
 #. module: ssi_va
+#: code:addons/ssi_va/models/ir_model.py:0
 #: code:addons/ssi_va/wizards/generate_va.py:0
 #: model:ir.actions.act_window,name:ssi_va.generate_va_action
 #: model_terms:ir.ui.view,arch_db:ssi_va.generate_va_view_form
 #, python-format
 msgid "Generate VA"
+msgstr ""
+
+#. module: ssi_va
+#: code:addons/ssi_va/models/ir_model.py:0
+#, python-format
+msgid "Generate VA #%s"
 msgstr ""
 
 #. module: ssi_va
@@ -542,6 +555,7 @@ msgstr ""
 
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_generate_va__id
+#: model:ir.model.fields,field_description:ssi_va.field_ir_model__id
 #: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller__id
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code__id
@@ -606,6 +620,7 @@ msgstr ""
 
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_generate_va____last_update
+#: model:ir.model.fields,field_description:ssi_va.field_ir_model____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_res_partner_bank____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller____last_update
 #: model:ir.model.fields,field_description:ssi_va.field_va_biller_code____last_update
@@ -764,6 +779,11 @@ msgid ""
 "Model this generator type is restricted to. When set, this generator type is"
 " only selectable from the VA generation wizard when run from this model. "
 "Left empty, it is available for all models."
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model,name:ssi_va.model_ir_model
+msgid "Models"
 msgstr ""
 
 #. module: ssi_va
