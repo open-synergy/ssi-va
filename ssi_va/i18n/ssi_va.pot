@@ -431,6 +431,11 @@ msgid "Export Configuration"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_va_generator__exporter_id
+msgid "Exporter"
+msgstr ""
+
+#. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_va_generator_exporter__format
 msgid ""
 "File format produced by generate_file(). This only determines how the rows "
@@ -477,6 +482,11 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_exporter__format
 msgid "Format"
+msgstr ""
+
+#. module: ssi_va
+#: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_view_form
+msgid "Generate Export File"
 msgstr ""
 
 #. module: ssi_va
@@ -631,6 +641,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_va_generator__exporter_id
+msgid ""
+"Layout and file format used when generating the export file for this "
+"document. Left editable in the done state as well, so a document that "
+"already reached done without one set can still be fixed without cancelling "
+"it (cancelling would delete every generated Virtual Account)."
 msgstr ""
 
 #. module: ssi_va
