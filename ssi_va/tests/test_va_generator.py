@@ -20,11 +20,14 @@ class TestVAGenerator(YamlTransactionCase):
         timestamp berformat YYYYmmdd_HHMMSS benar-benar dipakai pada nama
         attachment hasil action_generate_export_file.
         """
-        # va_generator_validator_group (which base.user_admin belongs to,
-        # see security/res_groups/va_generator.xml) is required to confirm
-        # and approve the document - matching the "as_user: base.user_admin"
-        # steps used by every confirm/approve scenario in
-        # test_data_va_generator.yaml.
+        # Create as base.user_admin (member of va_generator_validator_group,
+        # see security/res_groups/va_generator.xml), matching the
+        # "as_user: base.user_admin" create step used by every
+        # confirm/approve scenario in test_data_va_generator.yaml and the
+        # with_user(...).create(...) + invalidate_cache() pattern used by
+        # ssi_customer_invoice_export's own workflow test. action_confirm/
+        # action_approve_approval are then called without an explicit
+        # with_user, inheriting that same admin environment.
         admin_user = self.env.ref("base.user_admin")
         model_res_partner = self.env.ref("base.model_res_partner")
         partner = self.env["res.partner"].create({"name": "Test Partner Regex"})
@@ -67,11 +70,15 @@ class TestVAGenerator(YamlTransactionCase):
                 "res_id": partner.id,
             }
         )
-        generator.with_user(admin_user).action_confirm()
-        generator.with_user(admin_user).action_approve_approval()
+        generator.action_confirm()
+        generator.invalidate_cache()
+        self.assertEqual(generator.state, "confirm")
+
+        generator.action_approve_approval()
+        generator.invalidate_cache()
         self.assertEqual(generator.state, "done")
 
-        generator.with_user(admin_user).action_generate_export_file()
+        generator.action_generate_export_file()
 
         attachment = self.env["ir.attachment"].search(
             [
