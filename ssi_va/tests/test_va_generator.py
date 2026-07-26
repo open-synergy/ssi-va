@@ -20,6 +20,12 @@ class TestVAGenerator(YamlTransactionCase):
         timestamp berformat YYYYmmdd_HHMMSS benar-benar dipakai pada nama
         attachment hasil action_generate_export_file.
         """
+        # va_generator_validator_group (which base.user_admin belongs to,
+        # see security/res_groups/va_generator.xml) is required to confirm
+        # and approve the document - matching the "as_user: base.user_admin"
+        # steps used by every confirm/approve scenario in
+        # test_data_va_generator.yaml.
+        admin_user = self.env.ref("base.user_admin")
         model_res_partner = self.env.ref("base.model_res_partner")
         partner = self.env["res.partner"].create({"name": "Test Partner Regex"})
         exporter = self.env["va_generator_exporter"].create(
@@ -43,12 +49,16 @@ class TestVAGenerator(YamlTransactionCase):
                 "code": "/",
             }
         )
-        generator = self.env["va_generator"].create(
-            {
-                "type_id": generator_type.id,
-                "biller_id": biller.id,
-                "exporter_id": exporter.id,
-            }
+        generator = (
+            self.env["va_generator"]
+            .with_user(admin_user)
+            .create(
+                {
+                    "type_id": generator_type.id,
+                    "biller_id": biller.id,
+                    "exporter_id": exporter.id,
+                }
+            )
         )
         self.env["va_generator.source_data"].create(
             {
@@ -57,11 +67,11 @@ class TestVAGenerator(YamlTransactionCase):
                 "res_id": partner.id,
             }
         )
-        generator.action_confirm()
-        generator.action_approve_approval()
+        generator.with_user(admin_user).action_confirm()
+        generator.with_user(admin_user).action_approve_approval()
         self.assertEqual(generator.state, "done")
 
-        generator.action_generate_export_file()
+        generator.with_user(admin_user).action_generate_export_file()
 
         attachment = self.env["ir.attachment"].search(
             [

@@ -794,7 +794,7 @@ scenarios:
         values:
           name: "Sequence Based"
           code: "/"
-          python_code: 'result = "U1"'
+          python_code: 'result = "U10"'
       - step: "Create biller"
         action: "create"
         model: "va_biller"
@@ -809,7 +809,7 @@ scenarios:
         values:
           va_biller_id: "REC: biller.id"
           bank_id: "REC: bank_a.id"
-          biller_code: "B1"
+          biller_code: "B10"
       - step: "Create VA generator with exporter already set"
         action: "create"
         model: "va_generator"
@@ -905,7 +905,7 @@ scenarios:
         values:
           name: "Sequence Based"
           code: "/"
-          python_code: 'result = "U2"'
+          python_code: 'result = "U11"'
       - step: "Create biller"
         action: "create"
         model: "va_biller"
@@ -920,7 +920,7 @@ scenarios:
         values:
           va_biller_id: "REC: biller.id"
           bank_id: "REC: bank_a.id"
-          biller_code: "B2"
+          biller_code: "B11"
       - step: "Create VA generator with exporter already set"
         action: "create"
         model: "va_generator"
@@ -1028,7 +1028,7 @@ scenarios:
         values:
           name: "Sequence Based"
           code: "/"
-          python_code: 'result = "U4"'
+          python_code: 'result = "U12"'
       - step: "Create biller"
         action: "create"
         model: "va_biller"
@@ -1043,7 +1043,7 @@ scenarios:
         values:
           va_biller_id: "REC: biller.id"
           bank_id: "REC: bank_a.id"
-          biller_code: "B4"
+          biller_code: "B12"
       - step: "Create VA generator without exporter"
         action: "create"
         model: "va_generator"
