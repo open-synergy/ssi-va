@@ -26,12 +26,15 @@ class TestGenerateVA(YamlTransactionCase):
         )
         biller = self.env["va_biller"].create({"name": "Biller A", "code": "/"})
         partner = self.env["res.partner"].create({"name": "Test Partner"})
-        wizard = self.env["generate_va"].create(
-            {
-                "partner_ids": [(6, 0, partner.ids)],
-                "type_id": generator_type.id,
-                "biller_id": biller.id,
-            }
+        wizard = (
+            self.env["generate_va"]
+            .with_context(active_model="res.partner", active_ids=partner.ids)
+            .create(
+                {
+                    "type_id": generator_type.id,
+                    "biller_id": biller.id,
+                }
+            )
         )
 
         action = wizard.action_generate()

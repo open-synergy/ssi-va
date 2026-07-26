@@ -2,47 +2,32 @@
 # Copyright 2026 PT. Simetri Sinergi Indonesia
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 
 class GenerateVA(models.TransientModel):
     """
     Wizard to generate a Virtual Account (VA) generator document
-    (``va_generator``) for one or more partners, launched as an
-    ``Action`` from the Contact list/form view. Populates the resulting
-    document's ``source_data_ids`` with one line per selected partner
-    and leaves it in the ``draft`` state for manual review/confirmation.
+    (``va_generator``) out of the record(s) it is launched from,
+    whatever their model. Reads the source model/record IDs from the
+    context (``active_model``/``active_ids``) instead of storing them
+    on any field, populates the resulting document's
+    ``source_data_ids`` with one line per source record, and leaves it
+    in the ``draft`` state for manual review/confirmation.
     """
 
     _name = "generate_va"
     _description = "Generate Virtual Account"
 
-    partner_ids = fields.Many2many(
-        string="Partners",
-        comodel_name="res.partner",
-        relation="generate_va_res_partner_rel",
-        column1="wizard_id",
-        column2="partner_id",
-        required=True,
-        default=lambda self: self._default_partner_ids(),
-        help="Partners to generate Virtual Account numbers for. One "
-        "source data line is created on the resulting document for "
-        "each partner selected here. Defaults to the Contact records "
-        "selected in the list view this wizard was launched from.",
-    )
     type_id = fields.Many2one(
         string="Generator Type",
         comodel_name="va_generator_type",
         required=True,
-        domain=[
-            "|",
-            ("model_id", "=", False),
-            ("model_id.model", "=", "res.partner"),
-        ],
         help="Generator type whose python_code computes the unique VA "
-        "code. Only generator types not restricted to a model, or "
-        "restricted to Contact, are offered.",
+        "code. Generator types restricted to a model different from "
+        "the model this wizard is launched from are rejected when "
+        "Generate VA is pressed.",
     )
     biller_id = fields.Many2one(
         string="Biller",
@@ -61,11 +46,6 @@ class GenerateVA(models.TransientModel):
         "generated at biller level.",
     )
 
-    @api.model
-    def _default_partner_ids(self):
-        active_ids = self.env.context.get("active_ids", [])
-        return self.env["res.partner"].browse(active_ids)
-
     def action_generate(self):
         for record in self.sudo():
             result = record._generate()
@@ -73,22 +53,76 @@ class GenerateVA(models.TransientModel):
 
     def _generate(self):
         self.ensure_one()
-        self._check_partner_ids()
+        self._check_type_id()
         generator = self.env["va_generator"].create(self._prepare_va_generator_data())
         return self._open_va_generator(generator)
 
-    def _check_partner_ids(self):
+    def _get_source_model_criteria(self):
+        active_model = self.env.context.get("active_model")
+        return [("model", "=", active_model)]
+
+    def _get_source_model(self):
         self.ensure_one()
-        if not self.partner_ids:
+        active_model = self.env.context.get("active_model")
+        model = (
+            self.env["ir.model"].search(self._get_source_model_criteria(), limit=1)
+            if active_model
+            else self.env["ir.model"]
+        )
+        if not active_model or not model:
             error_message = """
 Document Type: %s
 Context: Generate Virtual Account
 Database ID: %s
-Problem: No partner has been selected
-Solution: Select at least one partner before generating Virtual Account
+Problem: No source model could be resolved from the context this \
+wizard was launched from (active_model: %s)
+Solution: Launch this wizard from a list/form view action so its \
+context carries a valid active_model
 """ % (
                 self._description,
                 self.id,
+                active_model,
+            )
+            raise UserError(_(error_message))
+        return model
+
+    def _get_source_res_ids(self):
+        self.ensure_one()
+        active_ids = self.env.context.get("active_ids", [])
+        if not active_ids:
+            error_message = """
+Document Type: %s
+Context: Generate Virtual Account
+Database ID: %s
+Problem: No source record has been selected
+Solution: Select at least one record before generating Virtual Account
+""" % (
+                self._description,
+                self.id,
+            )
+            raise UserError(_(error_message))
+        return active_ids
+
+    def _check_type_id(self):
+        self.ensure_one()
+        source_model = self._get_source_model()
+        restrict_model = self.type_id.model_id
+        if restrict_model and restrict_model != source_model:
+            error_message = """
+Document Type: %s
+Context: Generate Virtual Account
+Database ID: %s
+Problem: Generator type %s is restricted to model %s, but this wizard \
+was launched from model %s
+Solution: Select a generator type that is not restricted, or is \
+restricted to %s
+""" % (
+                self._description,
+                self.id,
+                self.type_id.name,
+                restrict_model.model,
+                source_model.model,
+                source_model.model,
             )
             raise UserError(_(error_message))
 
@@ -99,16 +133,16 @@ Solution: Select at least one partner before generating Virtual Account
             "biller_id": self.biller_id.id,
             "merchant_id": self.merchant_id.id,
             "source_data_ids": [
-                (0, 0, self._prepare_source_data_data(partner))
-                for partner in self.partner_ids
+                (0, 0, self._prepare_source_data_data(res_id))
+                for res_id in self._get_source_res_ids()
             ],
         }
 
-    def _prepare_source_data_data(self, partner):
+    def _prepare_source_data_data(self, res_id):
         self.ensure_one()
         return {
-            "model_id": self.env.ref("base.model_res_partner").id,
-            "res_id": partner.id,
+            "model_id": self._get_source_model().id,
+            "res_id": res_id,
         }
 
     def _open_va_generator(self, generator):
