@@ -535,8 +535,9 @@ msgstr ""
 #. module: ssi_va
 #: model:ir.model.fields,help:ssi_va.field_generate_va__type_id
 msgid ""
-"Generator type whose python_code computes the unique VA code. Only generator"
-" types not restricted to a model, or restricted to Contact, are offered."
+"Generator type whose python_code computes the unique VA code. Generator "
+"types restricted to a model different from the model this wizard is launched"
+" from are rejected when Generate VA is pressed."
 msgstr ""
 
 #. module: ssi_va
@@ -894,20 +895,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__partner_python_code
 #: model_terms:ir.ui.view,arch_db:ssi_va.va_generator_type_view_form
 msgid "Partner Resolution Python Code"
-msgstr ""
-
-#. module: ssi_va
-#: model:ir.model.fields,field_description:ssi_va.field_generate_va__partner_ids
-msgid "Partners"
-msgstr ""
-
-#. module: ssi_va
-#: model:ir.model.fields,help:ssi_va.field_generate_va__partner_ids
-msgid ""
-"Partners to generate Virtual Account numbers for. One source data line is "
-"created on the resulting document for each partner selected here. Defaults "
-"to the Contact records selected in the list view this wizard was launched "
-"from."
 msgstr ""
 
 #. module: ssi_va
