@@ -1,20 +1,17 @@
 options:
   auto_refresh: true
 
-setup:
-  steps:
-    - step: "Create operating unit A"
-      action: "create"
-      model: "operating.unit"
-      save_as: "ou_a"
-      values:
-        name: "VA OU Test A"
-        code: "VA-OU-A"
-        partner_id: "base.main_partner"
-
 scenarios:
   - name: "va_generator created directly with operating_unit_id keeps the value"
     steps:
+      - step: "Create operating unit"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou"
+        values:
+          name: "VA OU Test 1"
+          code: "VA-OU-1"
+          partner_id: "base.main_partner"
       - step: "Create generator type"
         action: "create"
         model: "va_generator_type"
@@ -37,19 +34,27 @@ scenarios:
         values:
           type_id: "REC: generator_type.id"
           biller_id: "REC: biller.id"
-          operating_unit_id: "REC: ou_a.id"
+          operating_unit_id: "REC: ou.id"
       - step: "Assert operating_unit_id was stored"
         action: "assert"
         target: "generator"
         asserts:
           operating_unit_id:
             type: "m2o"
-            expected: "REC: ou_a"
+            expected: "REC: ou"
 
   - name:
       "generate_va wizard with operating_unit_id explicitly filled passes it through to
       the created va_generator"
     steps:
+      - step: "Create operating unit"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou"
+        values:
+          name: "VA OU Test 2"
+          code: "VA-OU-2"
+          partner_id: "base.main_partner"
       - step: "Create generator type"
         action: "create"
         model: "va_generator_type"
@@ -78,7 +83,7 @@ scenarios:
         values:
           type_id: "REC: generator_type.id"
           biller_id: "REC: biller.id"
-          operating_unit_id: "REC: ou_a.id"
+          operating_unit_id: "REC: ou.id"
         method: "action_generate"
       - step: "Find the created VA generator"
         action: "search"
@@ -93,7 +98,7 @@ scenarios:
         asserts:
           operating_unit_id:
             type: "m2o"
-            expected: "REC: ou_a"
+            expected: "REC: ou"
 
   - name:
       "generate_va wizard without operating_unit_id filled does not error and creates a
