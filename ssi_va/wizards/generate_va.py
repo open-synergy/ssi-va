@@ -2,7 +2,7 @@
 # Copyright 2026 PT. Simetri Sinergi Indonesia
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -29,10 +29,21 @@ class GenerateVA(models.TransientModel):
         "the model this wizard is launched from are rejected when "
         "Generate VA is pressed.",
     )
+    bank_id = fields.Many2one(
+        string="Bank",
+        comodel_name="res.bank",
+        required=True,
+        help="Bank the generated Virtual Account numbers are for. "
+        "Restricts the selectable Biller to those holding a Virtual "
+        "Account code for this bank, and is carried over to the "
+        "resulting va_generator document, which in turn restricts the "
+        "generated Virtual Account bank accounts to this bank only.",
+    )
     biller_id = fields.Many2one(
         string="Biller",
         comodel_name="va_biller",
         required=True,
+        domain="[('bank_code_ids.bank_id', '=', bank_id)]",
         help="Biller the generated Virtual Account numbers are for.",
     )
     merchant_id = fields.Many2one(
@@ -45,6 +56,14 @@ class GenerateVA(models.TransientModel):
         "biller are offered. Left empty, Virtual Account numbers are "
         "generated at biller level.",
     )
+
+    @api.onchange("bank_id")
+    def onchange_biller_id(self):
+        self.biller_id = False
+
+    @api.onchange("bank_id")
+    def onchange_merchant_id(self):
+        self.merchant_id = False
 
     def action_generate(self):
         for record in self.sudo():
@@ -130,6 +149,7 @@ restricted to %s
         self.ensure_one()
         return {
             "type_id": self.type_id.id,
+            "bank_id": self.bank_id.id,
             "biller_id": self.biller_id.id,
             "merchant_id": self.merchant_id.id,
             "source_data_ids": [

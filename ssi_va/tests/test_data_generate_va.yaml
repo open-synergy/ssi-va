@@ -46,6 +46,7 @@ scenarios:
         target: "partner"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
         method: "action_generate"
       - step: "Find the created VA generator"
@@ -144,6 +145,7 @@ scenarios:
         target: "partners_3"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
         method: "action_generate"
       - step: "Exactly one VA generator was created"
@@ -210,6 +212,7 @@ scenarios:
         target: "partner"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
           merchant_id: "REC: merchant.id"
         method: "action_generate"
@@ -262,6 +265,7 @@ scenarios:
         target: "user_admin"
         values:
           type_id: "REC: generator_type_users.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller_users.id"
         method: "action_generate"
       - step: "Find the created VA generator"
@@ -319,6 +323,7 @@ scenarios:
         target: "user_admin_open"
         values:
           type_id: "REC: generator_type_open.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller_open.id"
         method: "action_generate"
       - step: "Exactly one VA generator was created"
@@ -366,6 +371,7 @@ scenarios:
         as_user: "base.user_admin"
         values:
           type_id: "REC: generator_type_restricted.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller_mismatch.id"
         method: "action_generate"
         expect_error:
@@ -395,6 +401,7 @@ scenarios:
         save_as: "wizard"
         values:
           type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
       - step: "action_generate must fail because no active_model context was set"
         action: "call"

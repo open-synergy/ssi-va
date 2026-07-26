@@ -239,8 +239,8 @@ scenarios:
           type: "UserError"
 
   - name:
-      "Confirm is rejected when the merchant only has a code for a different
-      bank than the one selected on the document"
+      "Confirm is rejected when the merchant only has a code for a different bank than
+      the one selected on the document"
     steps:
       - step: "Create generator type"
         action: "create"
@@ -292,8 +292,8 @@ scenarios:
               - biller_id: "REC: biller_code_b.id"
                 merchant_code: "M31"
       - step:
-          "Create VA generator for the same biller, but for bank A (merchant
-          has no code there)"
+          "Create VA generator for the same biller, but for bank A (merchant has no code
+          there)"
         action: "create"
         model: "va_generator"
         save_as: "generator"
@@ -310,8 +310,8 @@ scenarios:
           model_id: "REC: model_res_partner.id"
           res_id: "REC: partner.id"
       - step:
-          "Confirm must fail because the merchant has no code for bank A,
-          even though it is the same biller"
+          "Confirm must fail because the merchant has no code for bank A, even though it
+          is the same biller"
         action: "call"
         target: "generator"
         method: "action_confirm"
@@ -363,17 +363,17 @@ scenarios:
               - biller_id: "REC: biller_code.id"
                 merchant_code: "M32"
       - step:
-          "Fill the form with bank_id/biller_id/merchant_id, then switch
-          bank_id to bank B"
+          "Fill the form with bank_id/biller_id/merchant_id, then switch bank_id to bank
+          B"
         action: "form"
         model: "va_generator"
         save: false
         ops:
-          - set: { type_id: "REC: generator_type" }
-          - set: { bank_id: "REC: bank_a" }
-          - set: { biller_id: "REC: biller" }
-          - set: { merchant_id: "REC: merchant" }
-          - set: { bank_id: "REC: bank_b" }
+          - set: {type_id: "REC: generator_type"}
+          - set: {bank_id: "REC: bank_a"}
+          - set: {biller_id: "REC: biller"}
+          - set: {merchant_id: "REC: merchant"}
+          - set: {bank_id: "REC: bank_b"}
           - assert:
               biller_id:
                 type: "value"
@@ -471,8 +471,8 @@ scenarios:
             expected: "REC: generator"
 
   - name:
-      "Full workflow at biller level generates exactly one bank account for
-      the selected bank, even when the biller has codes for other banks too"
+      "Full workflow at biller level generates exactly one bank account for the selected
+      bank, even when the biller has codes for other banks too"
     steps:
       - step: "Create generator type"
         action: "create"
@@ -546,8 +546,8 @@ scenarios:
             type: "value"
             expected: "done"
       - step:
-          "Exactly one bank account is generated, not one per bank code
-          held by the biller"
+          "Exactly one bank account is generated, not one per bank code held by the
+          biller"
         action: "search"
         model: "res.partner.bank"
         domain:
@@ -656,8 +656,8 @@ scenarios:
             expected: "REC: partner"
 
   - name:
-      "Full workflow at merchant level uses only the merchant code matching
-      the selected bank, even when the merchant has codes at another bank too"
+      "Full workflow at merchant level uses only the merchant code matching the selected
+      bank, even when the merchant has codes at another bank too"
     steps:
       - step: "Create generator type"
         action: "create"
@@ -697,8 +697,7 @@ scenarios:
           bank_id: "REC: bank_b.id"
           biller_code: "BB41"
       - step:
-          "Create merchant with a code registered under both bank codes of
-          the biller"
+          "Create merchant with a code registered under both bank codes of the biller"
         action: "create"
         model: "va_biller_merchant"
         save_as: "merchant"
@@ -749,9 +748,7 @@ scenarios:
           state:
             type: "value"
             expected: "done"
-      - step:
-          "Exactly one bank account is generated, not one per merchant code
-          line"
+      - step: "Exactly one bank account is generated, not one per merchant code line"
         action: "search"
         model: "res.partner.bank"
         domain:
@@ -759,8 +756,8 @@ scenarios:
         save_as: "bank_account"
         expect_count: 1
       - step:
-          "Assert the generated bank account uses the bank B merchant
-          code, not the bank A one"
+          "Assert the generated bank account uses the bank B merchant code, not the bank
+          A one"
         action: "assert"
         target: "bank_account"
         asserts:
