@@ -56,6 +56,15 @@ class GenerateVA(models.TransientModel):
         "biller are offered. Left empty, Virtual Account numbers are "
         "generated at biller level.",
     )
+    usage_id = fields.Many2one(
+        string="Bank Account Usage",
+        comodel_name="res_partner_bank_usage",
+        required=False,
+        help="Usage/purpose carried over to the resulting va_generator "
+        "document, which in turn copies it to every generated "
+        "res.partner.bank. Left empty, the resulting document is "
+        "created with no usage set.",
+    )
 
     @api.onchange("bank_id")
     def onchange_biller_id(self):
@@ -152,6 +161,7 @@ restricted to %s
             "bank_id": self.bank_id.id,
             "biller_id": self.biller_id.id,
             "merchant_id": self.merchant_id.id,
+            "usage_id": self.usage_id.id,
             "source_data_ids": [
                 (0, 0, self._prepare_source_data_data(res_id))
                 for res_id in self._get_source_res_ids()

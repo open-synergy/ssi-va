@@ -75,6 +75,74 @@ scenarios:
             type: "value"
             expected: "/"
 
+  - name: "Create va_generator with usage_id, then write it to a different usage"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U2"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank code for the biller matching bank_id"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "B2"
+      - step: "Create first bank account usage"
+        action: "create"
+        model: "res_partner_bank_usage"
+        save_as: "usage_1"
+        values:
+          name: "Invoice Collection"
+          code: "/"
+      - step: "Create second bank account usage"
+        action: "create"
+        model: "res_partner_bank_usage"
+        save_as: "usage_2"
+        values:
+          name: "Top Up"
+          code: "/"
+      - step: "Create VA generator with usage_id filled"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+          usage_id: "REC: usage_1.id"
+      - step: "Assert usage_id was stored as created"
+        action: "assert"
+        target: "generator"
+        asserts:
+          usage_id:
+            type: "m2o"
+            expected: "REC: usage_1"
+      - step: "Write usage_id to the second usage"
+        action: "write"
+        target: "generator"
+        values:
+          usage_id: "REC: usage_2.id"
+      - step: "Assert usage_id was updated to the value written"
+        action: "assert"
+        target: "generator"
+        asserts:
+          usage_id:
+            type: "m2o"
+            expected: "REC: usage_2"
+
   - name: "Confirm without source data is rejected"
     steps:
       - step: "Create generator type"
@@ -768,8 +836,7 @@ scenarios:
             type: "m2o"
             expected: "REC: bank_b"
 
-  - name:
-      "Full workflow propagates generator type usage_id to the generated bank account"
+  - name: "Full workflow propagates document usage_id to the generated bank account"
     steps:
       - step: "Create bank account usage"
         action: "create"
@@ -778,7 +845,7 @@ scenarios:
         values:
           name: "Invoice Collection"
           code: "/"
-      - step: "Create generator type with usage_id"
+      - step: "Create generator type"
         action: "create"
         model: "va_generator_type"
         save_as: "generator_type"
@@ -786,7 +853,6 @@ scenarios:
           name: "Sequence Based"
           code: "/"
           python_code: 'result = "U5"'
-          usage_id: "REC: usage.id"
       - step: "Create biller"
         action: "create"
         model: "va_biller"
@@ -802,7 +868,7 @@ scenarios:
           va_biller_id: "REC: biller.id"
           bank_id: "REC: bank_a.id"
           biller_code: "B5"
-      - step: "Create VA generator without merchant"
+      - step: "Create VA generator without merchant, with usage_id filled"
         action: "create"
         model: "va_generator"
         save_as: "generator"
@@ -811,6 +877,7 @@ scenarios:
           type_id: "REC: generator_type.id"
           bank_id: "REC: bank_a.id"
           biller_id: "REC: biller.id"
+          usage_id: "REC: usage.id"
       - step: "Add source data for the partner"
         action: "create"
         model: "va_generator.source_data"
@@ -843,7 +910,7 @@ scenarios:
           - ["va_generator_id", "=", "REC: generator.id"]
         save_as: "bank_account"
         expect_count: 1
-      - step: "Assert generated bank account usage_id matches the generator type"
+      - step: "Assert generated bank account usage_id matches the document"
         action: "assert"
         target: "bank_account"
         asserts:
@@ -852,10 +919,10 @@ scenarios:
             expected: "REC: usage"
 
   - name:
-      "Full workflow without generator type usage_id leaves generated bank account
-      usage_id empty"
+      "Full workflow without document usage_id leaves generated bank account usage_id
+      empty"
     steps:
-      - step: "Create generator type without usage_id"
+      - step: "Create generator type"
         action: "create"
         model: "va_generator_type"
         save_as: "generator_type"
@@ -878,7 +945,7 @@ scenarios:
           va_biller_id: "REC: biller.id"
           bank_id: "REC: bank_a.id"
           biller_code: "B6"
-      - step: "Create VA generator without merchant"
+      - step: "Create VA generator without merchant and without usage_id"
         action: "create"
         model: "va_generator"
         save_as: "generator"

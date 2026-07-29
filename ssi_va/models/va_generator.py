@@ -122,6 +122,17 @@ class VAGenerator(models.Model):
         "the merchant code registered for the selected biller. Left "
         "empty, Virtual Account numbers are generated at biller level.",
     )
+    usage_id = fields.Many2one(
+        string="Bank Account Usage",
+        comodel_name="res_partner_bank_usage",
+        required=False,
+        ondelete="restrict",
+        readonly=True,
+        states={"draft": [("readonly", False)]},
+        help="Usage/purpose copied to every res.partner.bank generated "
+        "by this document. Optional - left empty, generated bank "
+        "accounts are created with no usage set.",
+    )
     source_data_ids = fields.One2many(
         string="Source Data",
         comodel_name="va_generator.source_data",
@@ -367,7 +378,7 @@ resolves this source data line into a single res.partner record
             "bank_id": bank.id,
             "acc_number": acc_number,
             "va_generator_id": self.id,
-            "usage_id": self.type_id.usage_id.id,
+            "usage_id": self.usage_id.id,
         }
 
     def action_generate_export_file(self):
