@@ -80,6 +80,7 @@
                         domain="[('bank_code_ids.bank_id', '=', bank_id)]"
                     />
                 <field name="merchant_id" />
+                <field name="usage_id" />
                 <field name="exporter_id" />
             </xpath>
             <xpath expr="//page[1]" position="before">

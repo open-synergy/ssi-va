@@ -231,6 +231,108 @@ scenarios:
             type: "m2o"
             expected: "REC: merchant"
 
+  - name: "Wizard with usage_id selected fills the generator's usage_id"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create bank account usage"
+        action: "create"
+        model: "res_partner_bank_usage"
+        save_as: "usage"
+        values:
+          name: "Invoice Collection"
+          code: "/"
+      - step: "Create partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Test Partner"
+      - step: "Run wizard with usage_id selected"
+        action: "wizard"
+        model: "generate_va"
+        target: "partner"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+          usage_id: "REC: usage.id"
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Assert usage_id was carried over from the wizard"
+        action: "assert"
+        target: "generator"
+        asserts:
+          usage_id:
+            type: "m2o"
+            expected: "REC: usage"
+
+  - name: "Wizard without usage_id leaves the generator's usage_id empty"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Sequence Based"
+          code: "/"
+          python_code: 'result = "U1"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Biller A"
+          code: "/"
+      - step: "Create partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Test Partner"
+      - step: "Run wizard without selecting usage_id"
+        action: "wizard"
+        model: "generate_va"
+        target: "partner"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+        method: "action_generate"
+      - step: "Find the created VA generator"
+        action: "search"
+        model: "va_generator"
+        domain:
+          - ["biller_id", "=", "REC: biller.id"]
+        save_as: "generator"
+        expect_count: 1
+      - step: "Assert usage_id is empty"
+        action: "assert"
+        target: "generator"
+        asserts:
+          usage_id:
+            type: "value"
+            operator: "is_falsy"
+
   - name:
       "Wizard on a res.users record with a generator type restricted to res.users
       succeeds"

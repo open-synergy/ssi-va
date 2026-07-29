@@ -15,6 +15,7 @@
                     <field name="bank_id" />
                     <field name="biller_id" />
                     <field name="merchant_id" />
+                    <field name="usage_id" />
                 </group>
                 <footer>
                     <button
