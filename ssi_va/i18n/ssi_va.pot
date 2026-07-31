@@ -459,6 +459,7 @@ msgid "Export Configuration"
 msgstr ""
 
 #. module: ssi_va
+#: model:ir.model.fields,field_description:ssi_va.field_generate_va__exporter_id
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator__exporter_id
 msgid "Exporter"
 msgstr ""
@@ -679,6 +680,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_source_data__write_date
 #: model:ir.model.fields,field_description:ssi_va.field_va_generator_type__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: ssi_va
+#: model:ir.model.fields,help:ssi_va.field_generate_va__exporter_id
+msgid ""
+"Layout and file format carried over to the resulting va_generator document. "
+"Left empty, the resulting document is created with no exporter set, and its "
+"export file can only be generated after an exporter is filled in on the "
+"document itself."
 msgstr ""
 
 #. module: ssi_va
