@@ -65,6 +65,16 @@ class GenerateVA(models.TransientModel):
         "res.partner.bank. Left empty, the resulting document is "
         "created with no usage set.",
     )
+    exporter_id = fields.Many2one(
+        string="Exporter",
+        comodel_name="va_generator_exporter",
+        required=False,
+        help="Layout and file format carried over to the resulting "
+        "va_generator document. Left empty, the resulting document is "
+        "created with no exporter set, and its export file can only "
+        "be generated after an exporter is filled in on the document "
+        "itself.",
+    )
 
     @api.onchange("bank_id")
     def onchange_biller_id(self):
@@ -155,6 +165,12 @@ restricted to %s
             raise UserError(_(error_message))
 
     def _prepare_va_generator_data(self):
+        """Build the ``create()`` values for the resulting va_generator.
+
+        :return: values dict for ``va_generator.create()``, including one
+            ``source_data_ids`` line per source record.
+        :rtype: dict
+        """
         self.ensure_one()
         return {
             "type_id": self.type_id.id,
@@ -162,6 +178,7 @@ restricted to %s
             "biller_id": self.biller_id.id,
             "merchant_id": self.merchant_id.id,
             "usage_id": self.usage_id.id,
+            "exporter_id": self.exporter_id.id,
             "source_data_ids": [
                 (0, 0, self._prepare_source_data_data(res_id))
                 for res_id in self._get_source_res_ids()
