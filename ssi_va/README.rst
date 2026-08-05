@@ -20,6 +20,7 @@ Work Instruction
 * `Virtual Account Biller Merchant <docs/va_biller_merchant/index.html>`_
 * `Virtual Account Generator Type <docs/va_generator_type/index.html>`_
 * `Virtual Account Generator Exporter <docs/va_generator_exporter/index.html>`_
+* `Model (Add Generate VA Wizard) <docs/ir_model/index.html>`_
 
 
 Installation
