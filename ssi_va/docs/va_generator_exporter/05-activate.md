@@ -25,5 +25,5 @@
 ## Post-Condition
 
 - The records are restored and appear again in the default list view.
-- The records can be selected again as the exporter of a Virtual Account
-  generation document.
+- The records can be selected again as the exporter of a Virtual Account generation
+  document.

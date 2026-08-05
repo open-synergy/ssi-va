@@ -24,7 +24,6 @@
 ## Post-Condition
 
 - The records are archived and no longer appear in the default list view.
-- Deactivated export layouts cannot be selected as the exporter of a Virtual
-  Account generation document.
-- Virtual Account data that already references this export layout can still be
-  viewed.
+- Deactivated export layouts cannot be selected as the exporter of a Virtual Account
+  generation document.
+- Virtual Account data that already references this export layout can still be viewed.

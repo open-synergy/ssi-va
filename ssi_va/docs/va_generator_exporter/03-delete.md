@@ -9,8 +9,7 @@
 
 ## Pre-Condition
 
-- **Record:** The record is not referenced by any Virtual Account generation
-  data.
+- **Record:** The record is not referenced by any Virtual Account generation data.
 - **Access:** User is in group `Virtual Account Generator Exporter`.
 
 ## Flow
