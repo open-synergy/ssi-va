@@ -39,11 +39,11 @@
 7. On the **Partner Resolution Python Code** tab, review/edit the **Partner Resolution
    Python Code** field _(required)_. This code is executed (via `safe_eval`) to resolve
    the current source data line into the `res.partner` record Virtual Account numbers
-   are generated for, and **must assign exactly one `res.partner` record to the
-   variable `result`**. In addition to the standard safe_eval helpers listed above, the
-   following variables are available: `generator`, `source_data`, `source_record`,
-   `biller`, `merchant`. A default value (`result = source_data.source_data_id`) is
-   pre-filled; replace it with the actual resolution logic.
+   are generated for, and **must assign exactly one `res.partner` record to the variable
+   `result`**. In addition to the standard safe_eval helpers listed above, the following
+   variables are available: `generator`, `source_data`, `source_record`, `biller`,
+   `merchant`. A default value (`result = source_data.source_data_id`) is pre-filled;
+   replace it with the actual resolution logic.
 8. Click **Save**.
 
 ## Post-Condition

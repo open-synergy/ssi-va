@@ -30,9 +30,9 @@
    after the unique-code composition rule changes. It must keep assigning a string to
    the variable `result`.
 6. On the **Partner Resolution Python Code** tab, edit the **Partner Resolution Python
-   Code** field as needed — for example after the source data no longer maps directly
-   to a partner. It must keep assigning exactly one `res.partner` record to the
-   variable `result`.
+   Code** field as needed — for example after the source data no longer maps directly to
+   a partner. It must keep assigning exactly one `res.partner` record to the variable
+   `result`.
 7. Click **Save**.
 
 ## Post-Condition
