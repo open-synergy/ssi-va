@@ -12,6 +12,12 @@ Virtual Account generation batches can be scoped and restricted per
 Operating Unit in addition to per company.
 
 
+Work Instruction
+================
+
+* `Virtual Account Generator <docs/va_generator/index.html>`_
+
+
 Installation
 ============
 
