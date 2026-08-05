@@ -28,8 +28,8 @@
 - Status changes to **Cancelled**.
 - Every Virtual Account bank account listed in the **Generated Bank Accounts** tab is
   deleted, so the tab becomes empty. This also applies when the document is cancelled
-  from **Done** — any Virtual Account numbers already generated are removed together with
-  the change of status, and the document must go through **Confirm**/**Approve** again to
-  regenerate them.
+  from **Done** — any Virtual Account numbers already generated are removed together
+  with the change of status, and the document must go through **Confirm**/**Approve**
+  again to regenerate them.
 - A notification is posted on the document's chatter (e.g. _"Virtual Account Generator
   ... cancelled"_).

@@ -9,10 +9,10 @@
 ## Pre-Condition
 
 - **Record:** Status is **Done**.
-- **Record:** The **Exporter** field is filled in. It remains editable while the document
-  is in **Done** status, so a document that already reached **Done** without an Exporter
-  set can still be fixed here directly — there is no need to cancel it first (cancelling
-  would delete every generated Virtual Account, see `10-cancel`).
+- **Record:** The **Exporter** field is filled in. It remains editable while the
+  document is in **Done** status, so a document that already reached **Done** without an
+  Exporter set can still be fixed here directly — there is no need to cancel it first
+  (cancelling would delete every generated Virtual Account, see `10-cancel`).
 - **Access:** User is in group `Virtual Account Generator / User`.
 
 ## Flow
