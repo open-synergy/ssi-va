@@ -3,8 +3,8 @@
 > **Module:** ssi_va\
 > **Model:** `va_generator`\
 > **Menu:** Financial Accounting > Bank & Cash > VA Generators\
-> **Actor:** approver in group `Virtual Account Generator / Validator` on the currently
-> pending approval level\
+> **Actor:** approver in group `Virtual Account Generator / Validator` on the currently pending
+> approval level\
 > **State:** `confirm` → `done`\
 > **Requires:** `04-confirm`
 
@@ -29,8 +29,8 @@
 
 - If there are still pending approval levels after this approval, status remains
   **Waiting for Approval** and the next level becomes pending.
-- If this was the last pending approval level, the document automatically transitions
-  to **Done** — there is no separate **Done** button for this model. As part of that
+- If this was the last pending approval level, the document automatically transitions to
+  **Done** — there is no separate **Done** button for this model. As part of that
   automatic transition:
   - The document number is issued, replacing **/**.
   - The **Generated Bank Accounts** tab is populated with one bank account per

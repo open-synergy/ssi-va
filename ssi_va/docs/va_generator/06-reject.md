@@ -3,8 +3,8 @@
 > **Module:** ssi_va\
 > **Model:** `va_generator`\
 > **Menu:** Financial Accounting > Bank & Cash > VA Generators\
-> **Actor:** approver in group `Virtual Account Generator / Validator` on the currently
-> pending approval level\
+> **Actor:** approver in group `Virtual Account Generator / Validator` on the currently pending
+> approval level\
 > **State:** `confirm` → `reject`\
 > **Requires:** `04-confirm`
 
@@ -26,5 +26,5 @@
 ## Post-Condition
 
 - Status changes to **Rejected**.
-- A notification is posted on the document's chatter (e.g. *"Virtual Account Generator
-  ... rejected"*).
+- A notification is posted on the document's chatter (e.g. _"Virtual Account Generator
+  ... rejected"_).

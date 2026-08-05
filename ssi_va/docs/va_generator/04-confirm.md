@@ -32,16 +32,16 @@
 ## Post-Condition
 
 - Status changes to **Waiting for Approval**.
-- Approval records are created for each approver level defined by the matching
-  approval template.
+- Approval records are created for each approver level defined by the matching approval
+  template.
 
 Any of the four checks in **Pre-Condition** that is not met blocks the Confirm action
 with a corresponding error message instead of producing the result above:
 
-- No source data line: *"No source data has been added"*.
-- Biller without a code for the selected bank: *"Biller ... has no Virtual Account code
-  registered for bank ..."*.
-- Merchant without a biller code for the selected biller: *"Merchant ... has no biller
-  code registered for biller ..."*.
-- A source data line that cannot be resolved into a `res.partner` record: *"Source data
-  ... could not be resolved into a res.partner record: ..."*.
+- No source data line: _"No source data has been added"_.
+- Biller without a code for the selected bank: _"Biller ... has no Virtual Account code
+  registered for bank ..."_.
+- Merchant without a biller code for the selected biller: _"Merchant ... has no biller
+  code registered for biller ..."_.
+- A source data line that cannot be resolved into a `res.partner` record: _"Source data
+  ... could not be resolved into a res.partner record: ..."_.
