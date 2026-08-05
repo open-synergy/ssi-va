@@ -13,6 +13,12 @@ subsequent Virtual Account generation, export, and webhook delivery
 features.
 
 
+Work Instruction
+================
+
+* `Virtual Account Biller <docs/va_biller/index.html>`_
+
+
 Installation
 ============
 
