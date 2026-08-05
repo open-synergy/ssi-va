@@ -26,18 +26,18 @@
    **/**. Only applies when **Code** is still **/**; records with a manually entered
    code are left unchanged.
 5. On the **Biller Codes** tab, add, edit, or remove lines to update the
-   biller-bank-specific merchant codes for this merchant. Repeat the following steps
-   as many times as needed:
+   biller-bank-specific merchant codes for this merchant. Repeat the following steps as
+   many times as needed:
    - Click **Add a line** to add a new biller code, or click an existing line to edit
      it.
    - Fill in each line with:
      - **Biller Bank Code** _(required)_: Select the biller-bank code line (a
-       `va_biller.code` record, displayed as "Biller - Bank (Code)") that this
-       merchant code is registered for. This field selects a **biller-bank
-       combination**, not a biller or a bank directly. Each biller-bank code line can
-       be used only once per merchant.
-     - **Bank**: Automatically filled from the selected **Biller Bank Code** and
-       cannot be changed.
+       `va_biller.code` record, displayed as "Biller - Bank (Code)") that this merchant
+       code is registered for. This field selects a **biller-bank combination**, not a
+       biller or a bank directly. Each biller-bank code line can be used only once per
+       merchant.
+     - **Bank**: Automatically filled from the selected **Biller Bank Code** and cannot
+       be changed.
      - **Merchant Code** _(required)_: Enter the merchant code registered for the
        selected biller-bank combination, used when generating Virtual Account numbers
        for this merchant.
@@ -48,6 +48,6 @@
 - The record is updated with the new values.
 - If **Generate Code** was used, the **Code** field now holds a value from the
   configured sequence template.
-- Biller code lines added, edited, or removed on the **Biller Codes** tab are
-  reflected in the corresponding `va_biller_merchant.code` records, with **Bank**
-  derived from the selected **Biller Bank Code**.
+- Biller code lines added, edited, or removed on the **Biller Codes** tab are reflected
+  in the corresponding `va_biller_merchant.code` records, with **Bank** derived from the
+  selected **Biller Bank Code**.

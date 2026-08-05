@@ -26,20 +26,20 @@
    - **Code** _(required)_: Enter a unique code, or enter **/** to leave it blank for
      now and assign it later with the **Generate Code** button.
 4. Click **Generate Code** in the header to assign a value to the **Code** field from
-   the configured sequence template. Only applies when **Code** is still **/** —
-   records with a manually entered code are left unchanged. Skip this step if a code
-   was already entered manually in step 3.
+   the configured sequence template. Only applies when **Code** is still **/** — records
+   with a manually entered code are left unchanged. Skip this step if a code was already
+   entered manually in step 3.
 5. On the **Biller Codes** tab, add lines to record the biller-bank-specific merchant
    codes for this merchant. Repeat the following steps as many times as needed:
    - Click **Add a line**.
    - Fill in each line with:
      - **Biller Bank Code** _(required)_: Select the biller-bank code line (a
-       `va_biller.code` record, displayed as "Biller - Bank (Code)") that this
-       merchant code is registered for. This field selects a **biller-bank
-       combination**, not a biller or a bank directly. Each biller-bank code line can
-       be used only once per merchant.
-     - **Bank**: Automatically filled from the selected **Biller Bank Code** and
-       cannot be changed.
+       `va_biller.code` record, displayed as "Biller - Bank (Code)") that this merchant
+       code is registered for. This field selects a **biller-bank combination**, not a
+       biller or a bank directly. Each biller-bank code line can be used only once per
+       merchant.
+     - **Bank**: Automatically filled from the selected **Biller Bank Code** and cannot
+       be changed.
      - **Merchant Code** _(required)_: Enter the merchant code registered for the
        selected biller-bank combination, used when generating Virtual Account numbers
        for this merchant.
@@ -47,8 +47,8 @@
 
 ## Post-Condition
 
-- A new **Virtual Account Biller Merchant** record is created and appears in the
-  Biller Merchants list.
+- A new **Virtual Account Biller Merchant** record is created and appears in the Biller
+  Merchants list.
 - If **Generate Code** was used, the **Code** field now holds a value from the
   configured sequence template.
 - Each line added on the **Biller Codes** tab creates a corresponding
