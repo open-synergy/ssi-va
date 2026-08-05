@@ -17,6 +17,7 @@ Work Instruction
 ================
 
 * `Virtual Account Biller <docs/va_biller/index.html>`_
+* `Virtual Account Biller Merchant <docs/va_biller_merchant/index.html>`_
 
 
 Installation
