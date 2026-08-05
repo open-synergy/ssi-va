@@ -1,16 +1,16 @@
 # Activate Virtual Account Biller
 
-> **Module:** ssi_va
-> **Model:** `va_biller`
-> **Menu:** Financial Accounting > Configuration > Virtual Account > Billers
-> **Actor:** user in group *Virtual Account Biller*
-> **Active:** `false` → `true`
+> **Module:** ssi_va\
+> **Model:** `va_biller`\
+> **Menu:** Financial Accounting > Configuration > Virtual Account > Billers\
+> **Actor:** user in group `Virtual Account Biller`\
+> **Active:** `false` → `true`\
 > **Requires:** `04-deactivate`
 
 ## Pre-Condition
 
 - **Record:** The record is currently archived.
-- **Access:** User is in group *Virtual Account Biller*.
+- **Access:** User is in group `Virtual Account Biller`.
 
 ## Flow
 
