@@ -14,6 +14,7 @@
     "application": False,
     "category": "Accounting",
     "depends": [
+        "web_tour",
         "ssi_master_data_mixin",
         "ssi_localdict_mixin",
         "ssi_transaction_confirm_mixin",
@@ -44,6 +45,7 @@
         "approval_template/va_generator.xml",
         "policy_template/va_generator.xml",
         "menu.xml",
+        "views/assets.xml",
         "views/va_biller.xml",
         "views/va_biller_merchant.xml",
         "views/va_generator_type.xml",

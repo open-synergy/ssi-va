@@ -11,3 +11,4 @@ from . import test_generate_va
 from . import test_menu
 from . import test_module_category
 from . import test_ir_model
+from . import test_ui_va_biller
