@@ -31,6 +31,15 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
     var BILLER_APPROVE = "TOUR VAGEN Biller Approve";
     var BILLER_REJECT = "TOUR VAGEN Biller Reject";
     var BILLER_RESTART = "TOUR VAGEN Biller Restart";
+    // The tree row is matched with :contains(...) on the Biller name, so no
+    // name here may be a substring of another one -- hence "Redraft" for the
+    // restart IK, since "TOUR VAGEN Biller Restart" already belongs to the
+    // restart approval tour.
+    var BILLER_CANCEL = "TOUR VAGEN Biller Cancel";
+    var BILLER_REDRAFT = "TOUR VAGEN Biller Redraft";
+    var BILLER_NUMBER = "TOUR VAGEN Biller Number";
+    var BILLER_EXPORT = "TOUR VAGEN Biller Export";
+    var CANCEL_REASON = "TOUR VAGEN Cancel Reason";
     var MERCHANT_PREFIX = "TOUR VAGEN Merchant";
     var MERCHANT_CREATE = "TOUR VAGEN Merchant Create";
     var USAGE_PREFIX = "TOUR VAGEN Usage";
@@ -776,6 +785,274 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
             // ── Post-Condition — Status remains Waiting for Approval;
             // this action never changes the document's state.
             assertStatus("Waiting for Approval", "confirm")
+        )
+    );
+
+    // IK: docs/va_generator/10-cancel.md
+    tour.register(
+        "ssi_va_va_generator_cancel",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record to cancel.
+            //
+            // The document prepared by setUpClass sits in Draft, the first
+            // of the three states this IK allows to start from.
+            openVAGeneratorRecord(BILLER_CANCEL, "cancel"),
+            [
+                // ── Flow 3 — Click the Cancel button.
+                //
+                // This button is declared type="action" (button_cancel of
+                // ssi_transaction_cancel_mixin), so what ends up in the DOM
+                // is name="<numeric id of the Select Cancel Reason window
+                // action>" -- an id that differs per database.
+                // button[name='action_cancel'] would never match; matching
+                // by label is mandatory here (odoo-development-ui-test
+                // selectors.md §4).
+                {
+                    content: "Click the Cancel button",
+                    trigger: ".o_statusbar_buttons button:enabled:contains('Cancel')",
+                    extra_trigger: ".o_form_view",
+                },
+
+                // ── Flow 4 — In the Select Cancel Reason wizard, select the
+                // Reason.
+                {
+                    // 14.0: do NOT prefix an in-modal trigger with `.modal`;
+                    // the trigger is already searched inside the displayed
+                    // modal (odoo-development-ui-test patterns.md §H).
+                    content: "The Select Cancel Reason wizard is displayed",
+                    trigger: ".o_form_view",
+                    run: function () {
+                        // Assertion only; do not trigger the default click
+                        // action.
+                    },
+                },
+                {
+                    // The field cancel_reason_id is rendered with
+                    // widget="radio" by the wizard view, so it is a radio
+                    // item that gets clicked -- not a many2one autocomplete.
+                    content: "Select the cancel reason",
+                    trigger:
+                        ".o_field_widget[name='cancel_reason_id'] " +
+                        ".o_radio_item:contains(" +
+                        CANCEL_REASON +
+                        ") input",
+                    run: "click",
+                },
+
+                // ── Flow 5 — Click Confirm.
+                {
+                    content: "Confirm the wizard",
+                    trigger: ".modal-footer button[name='action_confirm']",
+                },
+
+                // ── Flow 6 — Click OK on the confirmation dialog.
+                //
+                // The wizard's own Confirm button carries confirm="Are you
+                // sure?", which stacks a second dialog on top of the wizard;
+                // `$modal_displayed` is the topmost visible modal, so this
+                // trigger resolves to that dialog and not to the wizard
+                // footer below it.
+                {
+                    content: "Click OK on the confirmation dialog",
+                    trigger: ".modal-footer button.btn-primary",
+                    in_modal: true,
+                },
+            ],
+
+            // ── Post-Condition — Status changes to Cancelled.
+            //
+            // As in the reject tour, "cancel" is not part of
+            // _statusbar_visible_label ("draft,confirm,done"), but the web
+            // client always keeps the CURRENT value in the statusbar, so the
+            // arrow is on screen once the document reaches it.
+            assertStatus("Cancelled", "cancel"),
+            [
+                // ── Post-Condition — A notification is posted on the
+                // document's chatter.
+                //
+                // Only the presence of the message is asserted, not its
+                // wording beyond the word the mixin composes it around
+                // (_prepare_cancel_action_notification).
+                {
+                    content: "The cancellation notification is posted on the chatter",
+                    trigger: ".o_Message_content:contains(cancelled)",
+                    run: function () {
+                        // Assertion only; do not trigger the default click
+                        // action.
+                    },
+                },
+
+                // The second Post-Condition bullet -- every Virtual Account
+                // bank account of the Generated Bank Accounts tab is deleted
+                // so the tab becomes empty -- is NOT asserted here. The
+                // Keputusan Desain of this item keeps it out, and an emptied
+                // one2many is a value fact anyway; it is covered by the
+                // "Cancelling from done deletes the generated bank account"
+                // scenario of tests/test_data_va_generator.yaml.
+            ]
+        )
+    );
+
+    // IK: docs/va_generator/12-restart.md
+    tour.register(
+        "ssi_va_va_generator_restart",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record to restart.
+            //
+            // The document prepared by setUpClass sits in Cancelled, the
+            // first of the two states this IK allows to start from; the
+            // Rejected branch reaches the same button through the same
+            // policy field (restart_ok).
+            openVAGeneratorRecord(BILLER_REDRAFT, "restart"),
+
+            // ── Flow 3 — Click the Restart button.
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            //
+            // action_restart is type="object" and carries confirm="Restart
+            // data. Are you sure?" in the mixin form view, so the dialog is
+            // part of the flow rather than a tour-only detour. Targeting the
+            // method name also keeps this apart from the Restart Approval
+            // Process button, whose label contains "Restart" as well.
+            clickConfirmedButton("Restart", "action_restart"),
+
+            // ── Post-Condition — Status returns to Draft.
+            assertStatus("Draft", "draft")
+        )
+    );
+
+    // IK: docs/va_generator/13-reset-number.md
+    tour.register(
+        "ssi_va_va_generator_reset_number",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record whose document number will be
+            // reset.
+            openVAGeneratorRecord(BILLER_NUMBER, "reset the document number of"),
+
+            // ── Flow 3 — Click the Reset Document Number button.
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            clickConfirmedButton(
+                "Reset Document Number",
+                "action_reset_document_number"
+            ),
+            [
+                // ── Post-Condition — Document number returns to "/".
+                //
+                // The read-only title shows display_name, and
+                // mixin.transaction.name_get renders the number "/" as
+                // "*<id>", so the asterisk is the visible marker of the
+                // reset. This is a real gate rather than a selector that
+                // matches the previous screen too: setUpClass gives this
+                // document a manual number ("TOURVAGEN-RESET-0001"), which
+                // is exactly what the manual_number_ok Pre-Condition of this
+                // IK allows a user to type, so the title carries no asterisk
+                // before the button is clicked.
+                {
+                    content: "Document number is reset (display name shows *)",
+                    trigger:
+                        ".oe_title .o_field_widget[name='display_name']:contains(*)",
+                    run: function () {
+                        // Assertion only; do not trigger the default click
+                        // action.
+                    },
+                },
+
+                // The second Post-Condition bullet -- the record receives an
+                // automatic number once it reaches Done -- is NOT walked
+                // here: it describes the outcome of a later IK rather than
+                // of this Flow, and the issued number is a value. It stays
+                // with the unit tests in tests/test_data_va_generator.yaml.
+            ]
+        )
+    );
+
+    // IK: docs/va_generator/15-generate-export-file.md
+    //
+    // TWO DELIBERATE BOUNDARIES, stated here rather than silently skipped:
+    //
+    // 1. The Post-Condition -- "A new attachment is added to the document"
+    //    -- is NOT asserted. The attachment name pattern is excluded by the
+    //    Keputusan Desain of this item, and the arrival of the attachment
+    //    itself is not visible in 14.0: the chatter fetches its attachment
+    //    list when it is mounted (mail.chatter refresh on
+    //    _onThreadIdOrThreadModelChanged) and is not refetched when a header
+    //    button reloads the record, so the paperclip counter keeps showing
+    //    what it showed before the click. Asserting it would take navigation
+    //    steps this Flow does not contain. The attachment creation, its
+    //    count per click and its extension are covered by the "Generate
+    //    export file ..." scenarios of tests/test_data_va_generator.yaml.
+    // 2. The trailing paragraph of the IK -- the two Pre-Condition checks
+    //    that block the action with an error message -- is NOT walked: those
+    //    are negative paths ending in a UserError, which
+    //    odoo-development-ui-test assigns to the unit tests, where they are
+    //    covered by the "Generate export file is rejected ..." scenarios.
+    //
+    // The button itself is clicked: unlike the export buttons of §Q it
+    // returns no ir.actions.act_url and starts no download, it only writes
+    // an ir.attachment, so there is nothing that could hang headless Chrome.
+    tour.register(
+        "ssi_va_va_generator_generate_export_file",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record to generate the export file for.
+            openVAGeneratorRecord(BILLER_EXPORT, "generate the export file for"),
+            [
+                // ── Flow 3 — "If Exporter is not yet set, select one now."
+                //
+                // A conditional step whose condition is false here: the
+                // Record Pre-Condition of this IK requires the Exporter to
+                // be filled in, and setUpClass fills it when the document is
+                // created. Nothing to do.
+
+                // ── Flow 4 — Click the Generate Export File button.
+                {
+                    content: "Click the Generate Export File button",
+                    trigger:
+                        ".o_statusbar_buttons button[name='action_generate_export_file']",
+                    extra_trigger: ".o_form_view",
+                },
+                {
+                    // Real gate for the action having completed, not a
+                    // selector that matches the previous screen as well:
+                    // FormController._disableButtons() marks every header
+                    // button disabled synchronously with the click, and only
+                    // _enableButtons() -- reached after the call and the
+                    // record reload resolved -- removes that attribute
+                    // again. A UserError would instead leave an error dialog
+                    // on screen, which the extra_trigger rules out.
+                    content: "The export action finished without an error dialog",
+                    trigger:
+                        ".o_statusbar_buttons " +
+                        "button[name='action_generate_export_file']:enabled",
+                    extra_trigger: "body:not(:has(.modal:visible))",
+                    run: function () {
+                        // Assertion only; do not trigger the default click
+                        // action.
+                    },
+                },
+            ]
         )
     );
 });
