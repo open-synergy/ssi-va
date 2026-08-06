@@ -14,12 +14,14 @@
     "application": False,
     "category": "Accounting",
     "depends": [
+        "web_tour",
         "ssi_va",
         "ssi_operating_unit_mixin",
     ],
     "data": [
         "security/res_group/va_generator.xml",
         "security/ir_rule/va_generator.xml",
+        "view/assets.xml",
         "view/va_generator.xml",
         "view/generate_va.xml",
     ],
