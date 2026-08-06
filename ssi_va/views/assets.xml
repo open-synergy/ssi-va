@@ -17,6 +17,10 @@
                 type="text/javascript"
                 src="/ssi_va/static/tests/tours/va_generator_type_tour.js"
             />
+        <script
+                type="text/javascript"
+                src="/ssi_va/static/tests/tours/va_generator_exporter_tour.js"
+            />
     </xpath>
 </template>
 </odoo>
