@@ -77,6 +77,20 @@ class TestUiVAGenerator(HttpSavepointCase):
             }
         )
 
+        #: ``Data`` Pre-Condition of the cancel IK: the Select Cancel
+        #: Reason wizard only offers the reasons of
+        #: ``ir.model.all_cancel_reason_ids``, which merges the reasons
+        #: linked to the model with the globally usable ones. Creating it
+        #: with ``global_use`` avoids having to link it to ``va_generator``
+        #: through ``ir.model`` itself.
+        cls.cancel_reason = cls.env["base.cancel_reason"].create(
+            {
+                "name": "TOUR VAGEN Cancel Reason",
+                "code": "TOURVAGENCR",
+                "global_use": True,
+            }
+        )
+
         cls.type_alpha = cls._create_generator_type("TOUR VAGEN Type Alpha")
         cls.type_beta = cls._create_generator_type("TOUR VAGEN Type Beta")
 
@@ -115,6 +129,22 @@ class TestUiVAGenerator(HttpSavepointCase):
         cls.biller_restart = cls._create_biller(
             "TOUR VAGEN Biller Restart", cls.bank_alpha, "VART1"
         )
+        #: The tree row of a document is matched with ``:contains(...)`` on
+        #: its Biller name, so no biller name below may be a substring of
+        #: another one -- "TOUR VAGEN Biller Restart" already exists, hence
+        #: "Redraft" rather than "Restart Document" for the restart IK.
+        cls.biller_cancel = cls._create_biller(
+            "TOUR VAGEN Biller Cancel", cls.bank_alpha, "VACN1"
+        )
+        cls.biller_redraft = cls._create_biller(
+            "TOUR VAGEN Biller Redraft", cls.bank_alpha, "VARD1"
+        )
+        cls.biller_number = cls._create_biller(
+            "TOUR VAGEN Biller Number", cls.bank_alpha, "VANM1"
+        )
+        cls.biller_export = cls._create_biller(
+            "TOUR VAGEN Biller Export", cls.bank_alpha, "VAEX1"
+        )
 
         cls.merchant_create = cls._create_merchant(
             "TOUR VAGEN Merchant Create", cls.biller_create, "MC01"
@@ -145,6 +175,10 @@ class TestUiVAGenerator(HttpSavepointCase):
         cls.generator_approve = cls._create_confirmed_generator(cls.biller_approve)
         cls.generator_reject = cls._create_confirmed_generator(cls.biller_reject)
         cls.generator_restart = cls._create_stalled_generator(cls.biller_restart)
+        cls.generator_cancel = cls._create_generator(cls.biller_cancel)
+        cls.generator_redraft = cls._create_cancelled_generator(cls.biller_redraft)
+        cls.generator_reset_number = cls._create_numbered_generator(cls.biller_number)
+        cls.generator_export = cls._create_done_generator(cls.biller_export)
 
     @classmethod
     def _create_master_data(cls, model_name, name):
@@ -336,6 +370,78 @@ class TestUiVAGenerator(HttpSavepointCase):
         generator.write({"state": "confirm"})
         return generator
 
+    @classmethod
+    def _create_cancelled_generator(cls, biller):
+        """Create a cancelled ``va_generator``.
+
+        This is the Record Pre-Condition of the restart IK, whose first
+        allowed starting state is **Cancelled**. The document is taken
+        there through ``action_cancel`` so that the cancel reason is
+        stored exactly as the Select Cancel Reason wizard would store
+        it; the wizard itself is exercised by the cancel tour.
+
+        ``bypass_policy_check`` is set because the setup runs as the test
+        cursor's superuser rather than as the actor of the IK.
+
+        :param biller: ``va_biller`` of the document; its name is what
+            identifies the document's row in the tree view.
+        :type biller: :class:`odoo.models.Model`
+        :return: The created ``va_generator`` record, in ``cancel``.
+        :rtype: :class:`odoo.models.Model`
+        """
+        generator = cls._create_generator(biller)
+        generator.with_context(bypass_policy_check=True).action_cancel(
+            cls.cancel_reason
+        )
+        return generator
+
+    @classmethod
+    def _create_numbered_generator(cls, biller):
+        """Create a draft ``va_generator`` carrying a manual number.
+
+        The reset number IK requires a document in **Draft** whose actor
+        holds ``manual_number_ok``, i.e. a document whose number may be
+        typed by hand. Giving this one such a number is what makes the
+        reset observable at all: ``va_generator`` only receives an
+        automatic number when it reaches done
+        (``_create_sequence_state``), so an untouched draft already
+        carries ``/`` and resetting it would change nothing on screen.
+
+        :param biller: ``va_biller`` of the document; its name is what
+            identifies the document's row in the tree view.
+        :type biller: :class:`odoo.models.Model`
+        :return: The created ``va_generator`` record, in ``draft``.
+        :rtype: :class:`odoo.models.Model`
+        """
+        generator = cls._create_generator(biller)
+        generator.write({"name": "TOURVAGEN-RESET-0001"})
+        return generator
+
+    @classmethod
+    def _create_done_generator(cls, biller):
+        """Create a ``va_generator`` in the done state.
+
+        This is the Record Pre-Condition of the generate export file IK.
+        The document is first confirmed and then taken to done through
+        ``action_done`` -- the method the approval mixin itself calls
+        once the last approval lands (``_after_approved_method``) --
+        rather than through ``action_approve_approval``, because the
+        approval path is what the approve tour exercises and repeating
+        it here would tie this fixture to the shipped approval template.
+
+        The exporter is already set by ``_create_generator``, which is
+        the second Record Pre-Condition of that IK.
+
+        :param biller: ``va_biller`` of the document; its name is what
+            identifies the document's row in the tree view.
+        :type biller: :class:`odoo.models.Model`
+        :return: The created ``va_generator`` record, in ``done``.
+        :rtype: :class:`odoo.models.Model`
+        """
+        generator = cls._create_confirmed_generator(biller)
+        generator.with_context(bypass_policy_check=True).action_done()
+        return generator
+
     def test_create(self):
         """Run the create tour for ``va_generator``.
 
@@ -418,3 +524,80 @@ class TestUiVAGenerator(HttpSavepointCase):
         IK: docs/va_generator/14-restart-approval.md
         """
         self.start_tour("/web", "ssi_va_va_generator_restart_approval", login="admin")
+
+    def test_cancel(self):
+        """Run the cancel tour for ``va_generator``.
+
+        The tour cancels a document sitting in **Draft**, the first of
+        the three starting states the IK allows.
+
+        The second Post-Condition bullet -- every Virtual Account bank
+        account of the Generated Bank Accounts tab is deleted, so the tab
+        becomes empty -- is not asserted by the tour: the item's design
+        decision keeps it out, and an emptied one2many is a value fact
+        anyway. It is covered by the "Cancelling from done deletes the
+        generated bank account" scenario of
+        ``tests/test_data_va_generator.yaml``.
+
+        IK: docs/va_generator/10-cancel.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_cancel", login="admin")
+
+    def test_restart(self):
+        """Run the restart tour for ``va_generator``.
+
+        The tour restarts a document sitting in **Cancelled**, the first
+        of the two starting states the IK allows; the Rejected branch
+        reaches the very same button through the very same policy field
+        (``restart_ok``).
+
+        IK: docs/va_generator/12-restart.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_restart", login="admin")
+
+    def test_reset_number(self):
+        """Run the reset document number tour for ``va_generator``.
+
+        The second Post-Condition bullet -- the record receives an
+        automatic number once it reaches Done -- is not walked by the
+        tour: it describes what happens in a later IK, not an outcome of
+        this Flow, and the issued number is a value. It stays with the
+        unit tests in ``tests/test_data_va_generator.yaml``.
+
+        IK: docs/va_generator/13-reset-number.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_reset_number", login="admin")
+
+    def test_generate_export_file(self):
+        """Run the generate export file tour for ``va_generator``.
+
+        Two boundaries of this tour are deliberate and stated here as
+        well as in the tour file itself, so that they are read as scope
+        rather than as a hole:
+
+        * The Post-Condition -- a new attachment is added to the
+          document -- is not asserted. The attachment name pattern is
+          excluded by the item's design decision, and the arrival of the
+          attachment itself is invisible in 14.0: the chatter fetches
+          its attachment list when it is mounted and is not refetched
+          when a header button reloads the record, so the paperclip
+          counter still reads what it read before the click. The
+          attachment creation, its count per click and its extension are
+          covered by the "Generate export file ..." scenarios of
+          ``tests/test_data_va_generator.yaml``.
+        * The trailing paragraph of the IK -- the two Pre-Condition
+          checks that block the action with an error message -- is not
+          walked: those are negative paths ending in a ``UserError``,
+          which belong to the unit tests and are covered there by the
+          "Generate export file is rejected ..." scenarios.
+
+        Flow 3 ("If Exporter is not yet set, select one now") is a
+        conditional step whose condition is false here: the Record
+        Pre-Condition requires the Exporter to be filled in, and
+        ``setUpClass`` fills it.
+
+        IK: docs/va_generator/15-generate-export-file.md
+        """
+        self.start_tour(
+            "/web", "ssi_va_va_generator_generate_export_file", login="admin"
+        )
