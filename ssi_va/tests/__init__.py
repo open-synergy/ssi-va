@@ -14,3 +14,4 @@ from . import test_ir_model
 from . import test_ui_va_biller
 from . import test_ui_va_biller_merchant
 from . import test_ui_va_generator_type
+from . import test_ui_va_generator_exporter
