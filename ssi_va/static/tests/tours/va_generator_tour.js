@@ -27,6 +27,10 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
     var BILLER_CREATE = "TOUR VAGEN Biller Create";
     var BILLER_EDIT = "TOUR VAGEN Biller Edit";
     var BILLER_DELETE = "TOUR VAGEN Biller Delete";
+    var BILLER_CONFIRM = "TOUR VAGEN Biller Confirm";
+    var BILLER_APPROVE = "TOUR VAGEN Biller Approve";
+    var BILLER_REJECT = "TOUR VAGEN Biller Reject";
+    var BILLER_RESTART = "TOUR VAGEN Biller Restart";
     var MERCHANT_PREFIX = "TOUR VAGEN Merchant";
     var MERCHANT_CREATE = "TOUR VAGEN Merchant Create";
     var USAGE_PREFIX = "TOUR VAGEN Usage";
@@ -104,6 +108,105 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
                 content: "Pick " + picked + " from the dropdown",
                 trigger: ".ui-autocomplete .ui-menu-item a:contains(" + picked + ")",
                 in_modal: false,
+            },
+        ];
+    }
+
+    // Shared block for Flow 1 and Flow 2 of the four approval IK files
+    // (04-confirm, 05-approve, 06-reject, 14-restart-approval): "Open the
+    // Financial Accounting > Bank & Cash > VA Generators menu." followed
+    // by "Open the record to <action>."
+    //
+    // As in the edit and delete tours, the row is identified by its
+    // Biller. A va_generator keeps the document number "/" until it
+    // reaches done (_create_sequence_state = "done"), so the number
+    // column cannot tell two documents apart; setUpClass therefore gives
+    // each document a Biller of its own.
+    function openVAGeneratorRecord(billerName, action) {
+        return [].concat(openVAGeneratorList(), [
+            {
+                content: "Open the record to " + action,
+                trigger: ".o_data_row:contains(" + billerName + ") .o_data_cell:first",
+                extra_trigger: ".o_list_view",
+            },
+            {
+                content: "The record form is displayed",
+                trigger: ".o_form_view",
+                run: function () {
+                    // Assertion only; do not trigger the default click
+                    // action.
+                },
+            },
+        ]);
+    }
+
+    // Click a header button and acknowledge the dialog it raises.
+    //
+    // Both steps come from the Flow of the IK file being executed --
+    // "Click the <X> button." and "Click OK on the confirmation dialog."
+    // The dialog is not a tour-only detour: every approval button is
+    // declared with a confirm="..." attribute in
+    // ssi_transaction_confirm_mixin/templates/
+    // mixin_transaction_confirm_templates.xml, so it always appears.
+    function clickConfirmedButton(label, methodName) {
+        return [
+            {
+                content: "Click the " + label + " button",
+                trigger: ".o_statusbar_buttons button[name='" + methodName + "']",
+                extra_trigger: ".o_form_view",
+            },
+            {
+                content: "Click OK on the confirmation dialog",
+                trigger: ".modal-footer button.btn-primary",
+                in_modal: true,
+            },
+        ];
+    }
+
+    // Post-Condition assertion shared by the confirm and the restart
+    // approval IK files: approval records exist for the document's
+    // approver levels.
+    //
+    // The approval_ids field is hidden while the document has no
+    // approval record (attrs invisible in the multiple_approval template
+    // of ssi_multiple_approval_mixin), so this assertion cannot pass
+    // before the action under test actually ran -- it is a real gate,
+    // not a selector that matches the previous screen as well.
+    //
+    // Opening the notebook page is a UI mechanic rather than a Flow
+    // step. HOW MANY levels were created is a value fact and stays with
+    // the unit tests (tests/test_data_va_generator.yaml).
+    function assertApprovalRecords() {
+        return [
+            {
+                content: "Open the Approvals tab",
+                trigger: ".o_notebook .nav-link:contains(Approvals)",
+            },
+            {
+                content: "The Approvals tab lists an approval record",
+                trigger: ".o_field_widget[name='approval_ids'] .o_data_row",
+                run: function () {
+                    // Assertion only; do not trigger the default click
+                    // action.
+                },
+            },
+        ];
+    }
+
+    // Post-Condition assertion "Status changes to <label>." -- the
+    // statusbar arrow of `stateValue` is the highlighted one.
+    function assertStatus(label, stateValue) {
+        return [
+            {
+                content: "Status is " + label,
+                trigger:
+                    ".o_statusbar_status .o_arrow_button[data-value='" +
+                    stateValue +
+                    "'].btn-primary",
+                run: function () {
+                    // Assertion only; do not trigger the default click
+                    // action.
+                },
             },
         ];
     }
@@ -517,6 +620,162 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
                     },
                 },
             ]
+        )
+    );
+
+    // IK: docs/va_generator/04-confirm.md
+    tour.register(
+        "ssi_va_va_generator_confirm",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record to confirm.
+            openVAGeneratorRecord(BILLER_CONFIRM, "confirm"),
+
+            // ── Flow 3 — Click the Confirm button.
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            clickConfirmedButton("Confirm", "action_confirm"),
+
+            // ── Post-Condition — Status changes to Waiting for Approval.
+            assertStatus("Waiting for Approval", "confirm"),
+
+            // ── Post-Condition — Approval records are created for each
+            // approver level defined by the matching approval template.
+            assertApprovalRecords()
+
+            // The trailing paragraph of the IK -- the four Pre-Condition
+            // checks that block Confirm with an error message when they
+            // are not met -- is deliberately NOT covered here. Those are
+            // negative paths ending in a UserError, which
+            // odoo-development-ui-test assigns to the unit tests; they
+            // are covered by the "Confirm ... raises" scenarios of
+            // tests/test_data_va_generator.yaml.
+        )
+    );
+
+    // IK: docs/va_generator/05-approve.md
+    tour.register(
+        "ssi_va_va_generator_approve",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record to approve.
+            openVAGeneratorRecord(BILLER_APPROVE, "approve"),
+
+            // ── Flow 3 — Click the Approve button.
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            clickConfirmedButton("Approve", "action_approve_approval"),
+
+            // ── Post-Condition — the second branch of it. The approval
+            // template shipped with the module (approval_template/
+            // va_generator.xml) defines a single approver level, so this
+            // approval IS the last pending one and the document
+            // transitions to Done on its own -- there is no Done button
+            // for this model. The first branch ("status remains Waiting
+            // for Approval and the next level becomes pending") needs a
+            // multi-level template, which no IK file describes.
+            //
+            // The two sub-bullets of that Post-Condition -- the document
+            // number being issued and the Generated Bank Accounts tab
+            // being populated -- are not asserted here: the issued number
+            // and the generated Virtual Account records are values, and
+            // the Keputusan Desain of this item keeps them with the unit
+            // tests (tests/test_data_va_generator.yaml).
+            assertStatus("Done", "done")
+        )
+    );
+
+    // IK: docs/va_generator/06-reject.md
+    tour.register(
+        "ssi_va_va_generator_reject",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record to reject.
+            openVAGeneratorRecord(BILLER_REJECT, "reject"),
+
+            // ── Flow 3 — Click the Reject button.
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            clickConfirmedButton("Reject", "action_reject_approval"),
+
+            // ── Post-Condition — Status changes to Rejected.
+            //
+            // "reject" is not part of _statusbar_visible_label
+            // ("draft,confirm,done"), but the web client always keeps the
+            // CURRENT value in the statusbar (FieldStatus._setState in
+            // web/static/src/js/fields/relational_fields.js), so the
+            // arrow is on screen once the document reaches it.
+            assertStatus("Rejected", "reject"),
+            [
+                // ── Post-Condition — A notification is posted on the
+                // document's chatter.
+                //
+                // Only the presence of the message is asserted, not its
+                // wording beyond the word the mixin composes it around
+                // (_prepare_reject_action_notification).
+                {
+                    content: "The rejection notification is posted on the chatter",
+                    trigger: ".o_Message_content:contains(rejected)",
+                    run: function () {
+                        // Assertion only; do not trigger the default click
+                        // action.
+                    },
+                },
+            ]
+        )
+    );
+
+    // IK: docs/va_generator/14-restart-approval.md
+    tour.register(
+        "ssi_va_va_generator_restart_approval",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(
+            // ── Flow 1 — Open the Financial Accounting > Bank & Cash > VA
+            // Generators menu.
+            // ── Flow 2 — Open the record whose approval process is stuck.
+            openVAGeneratorRecord(BILLER_RESTART, "restart the approval process of"),
+
+            // ── Flow 3 — Click the Restart Approval Process button.
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            //
+            // The button only shows while the document has no approval
+            // template resolved, which is the second Pre-Condition of
+            // this IK; setUpClass puts the document in exactly that
+            // state.
+            clickConfirmedButton(
+                "Restart Approval Process",
+                "action_reload_approval_template"
+            ),
+
+            // ── Post-Condition — the branch where a matching
+            // approval.template IS found: fresh approval records are
+            // created for its approver levels, starting the approval
+            // process from the first level. The module ships a template
+            // matching every va_generator document
+            // (approval_template/va_generator.xml), so this is the branch
+            // the tour walks. The other branch ("still no template
+            // matches") would need the module's own template removed,
+            // which no IK file describes.
+            assertApprovalRecords(),
+
+            // ── Post-Condition — Status remains Waiting for Approval;
+            // this action never changes the document's state.
+            assertStatus("Waiting for Approval", "confirm")
         )
     );
 });

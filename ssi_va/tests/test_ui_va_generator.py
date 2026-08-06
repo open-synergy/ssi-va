@@ -40,16 +40,23 @@ class TestUiVAGenerator(HttpSavepointCase):
           code for those banks, merchants holding a biller code, bank
           account usages and exporters, so that every many2one of the
           Generate VA wizard and of the document form can be picked.
-        * ``Record`` -- two draft ``va_generator`` documents, one for
-          the edit tour and one for the delete tour. Each carries a
-          Biller of its own: a draft document's number is still ``/``,
-          so the Biller column of the tree view is what makes its row
-          identifiable.
+        * ``Record`` -- one ``va_generator`` document per tour that acts
+          on an existing document: draft ones for the edit, delete and
+          confirm tours, and documents already sitting in ``confirm``
+          for the approve, reject and restart approval tours. Each
+          carries a Biller of its own, because a document's number stays
+          ``/`` until it reaches done, so the Biller column of the tree
+          view is what makes its row identifiable.
 
-        The ``Config`` Pre-Condition of ``01-create`` -- a Generate VA
-        entry in the source model's Action menu -- needs no setup: the
-        binding for ``res.partner`` ships with the module
-        (``wizards/generate_va.xml``).
+        The ``Config`` Pre-Conditions need no setup either: the Generate
+        VA entry in the source model's Action menu is bound to
+        ``res.partner`` by the module (``wizards/generate_va.xml``), and
+        the ``policy.template`` and ``approval.template`` the approval
+        IK files require ship with it as well (``policy_template/`` and
+        ``approval_template/``). The shipped approval template selects
+        its approvers by group, and ``base.user_admin`` is a member of
+        ``Virtual Account Generator / Validator`` out of the box, which
+        is what puts the tour user on the pending approval level.
         """
         super().setUpClass()
 
@@ -96,6 +103,18 @@ class TestUiVAGenerator(HttpSavepointCase):
         cls.biller_beta = cls._create_biller(
             "TOUR VAGEN Biller Beta", cls.bank_beta, "VAB01"
         )
+        cls.biller_confirm = cls._create_biller(
+            "TOUR VAGEN Biller Confirm", cls.bank_alpha, "VACF1"
+        )
+        cls.biller_approve = cls._create_biller(
+            "TOUR VAGEN Biller Approve", cls.bank_alpha, "VAAP1"
+        )
+        cls.biller_reject = cls._create_biller(
+            "TOUR VAGEN Biller Reject", cls.bank_alpha, "VARJ1"
+        )
+        cls.biller_restart = cls._create_biller(
+            "TOUR VAGEN Biller Restart", cls.bank_alpha, "VART1"
+        )
 
         cls.merchant_create = cls._create_merchant(
             "TOUR VAGEN Merchant Create", cls.biller_create, "MC01"
@@ -122,6 +141,10 @@ class TestUiVAGenerator(HttpSavepointCase):
             merchant=cls.merchant_edit,
         )
         cls.generator_delete = cls._create_generator(cls.biller_delete)
+        cls.generator_confirm = cls._create_generator(cls.biller_confirm)
+        cls.generator_approve = cls._create_confirmed_generator(cls.biller_approve)
+        cls.generator_reject = cls._create_confirmed_generator(cls.biller_reject)
+        cls.generator_restart = cls._create_stalled_generator(cls.biller_restart)
 
     @classmethod
     def _create_master_data(cls, model_name, name):
@@ -261,6 +284,58 @@ class TestUiVAGenerator(HttpSavepointCase):
             }
         )
 
+    @classmethod
+    def _create_confirmed_generator(cls, biller):
+        """Create a ``va_generator`` waiting for approval.
+
+        Used for the approve and the reject IK files, whose Record
+        Pre-Condition is a document in **Waiting for Approval**. The
+        document is taken there through ``action_confirm`` so that the
+        approval template is resolved and the approval records are
+        created exactly as they would be for a user, which is what makes
+        the tour user a pending approver.
+
+        ``bypass_policy_check`` is set because the setup runs as the
+        test cursor's superuser rather than as the actor of the IK; the
+        policy itself is exercised by the confirm tour.
+
+        :param biller: ``va_biller`` of the document; its name is what
+            identifies the document's row in the tree view.
+        :type biller: :class:`odoo.models.Model`
+        :return: The created ``va_generator`` record, in ``confirm``.
+        :rtype: :class:`odoo.models.Model`
+        """
+        generator = cls._create_generator(biller)
+        generator.with_context(bypass_policy_check=True).action_confirm()
+        return generator
+
+    @classmethod
+    def _create_stalled_generator(cls, biller):
+        """Create a ``va_generator`` stuck without an approval template.
+
+        This is the Record Pre-Condition of the restart approval IK:
+        a document in **Waiting for Approval** whose **Approval
+        Template** field is empty, which is what makes the **Restart
+        Approval Process** button appear.
+
+        ``state`` is written directly instead of calling
+        ``action_confirm`` precisely because confirming resolves an
+        approval template -- the module ships one matching every
+        document. Writing the state reproduces the situation the IK
+        describes, a document that reached Waiting for Approval without
+        ever getting a template resolved.
+
+        :param biller: ``va_biller`` of the document; its name is what
+            identifies the document's row in the tree view.
+        :type biller: :class:`odoo.models.Model`
+        :return: The created ``va_generator`` record, in ``confirm``
+            and without approver.
+        :rtype: :class:`odoo.models.Model`
+        """
+        generator = cls._create_generator(biller)
+        generator.write({"state": "confirm"})
+        return generator
+
     def test_create(self):
         """Run the create tour for ``va_generator``.
 
@@ -295,3 +370,51 @@ class TestUiVAGenerator(HttpSavepointCase):
         IK: docs/va_generator/03-delete.md
         """
         self.start_tour("/web", "ssi_va_va_generator_delete", login="admin")
+
+    def test_confirm(self):
+        """Run the confirm tour for ``va_generator``.
+
+        The trailing paragraph of the IK -- the Pre-Condition checks
+        that block Confirm with an error message -- is not walked by the
+        tour: those are negative paths ending in a ``UserError``, which
+        belong to the unit tests and are covered by the "Confirm ...
+        raises" scenarios of ``tests/test_data_va_generator.yaml``.
+
+        IK: docs/va_generator/04-confirm.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_confirm", login="admin")
+
+    def test_approve(self):
+        """Run the approve tour for ``va_generator``.
+
+        The approval template shipped with the module defines a single
+        approver level, so the tour walks the second branch of the
+        Post-Condition: this approval is the last pending one and the
+        document transitions to Done on its own. Its two sub-bullets --
+        the issued document number and the generated Virtual Account
+        bank accounts -- are values, and stay with the unit tests in
+        ``tests/test_data_va_generator.yaml``.
+
+        IK: docs/va_generator/05-approve.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_approve", login="admin")
+
+    def test_reject(self):
+        """Run the reject tour for ``va_generator``.
+
+        IK: docs/va_generator/06-reject.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_reject", login="admin")
+
+    def test_restart_approval(self):
+        """Run the restart approval tour for ``va_generator``.
+
+        The tour walks the branch of the Post-Condition in which a
+        matching ``approval.template`` is found, because the module
+        ships one matching every document. The other branch -- still no
+        template matches, so the button remains available -- would need
+        that template removed, which no IK file describes.
+
+        IK: docs/va_generator/14-restart-approval.md
+        """
+        self.start_tour("/web", "ssi_va_va_generator_restart_approval", login="admin")
