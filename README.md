@@ -21,7 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[ssi_va](ssi_va/) | 14.0.1.15.9 |  | Virtual Account
+[ssi_va](ssi_va/) | 14.0.1.15.10 |  | Virtual Account
 [ssi_va_operating_unit](ssi_va_operating_unit/) | 14.0.1.2.1 |  | Virtual Account + Operating Unit Integration
 
 [//]: # (end addons)
