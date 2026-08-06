@@ -21,6 +21,10 @@
                 type="text/javascript"
                 src="/ssi_va/static/tests/tours/va_generator_exporter_tour.js"
             />
+        <script
+                type="text/javascript"
+                src="/ssi_va/static/tests/tours/ir_model_tour.js"
+            />
     </xpath>
 </template>
 </odoo>
