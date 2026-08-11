@@ -220,6 +220,34 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
         ];
     }
 
+    // Post-Condition assertion added by issue open-synergy/ssi-va#82: the
+    // Generation Status column is displayed in the Source Data tab's
+    // embedded list. Only the column's presence is asserted here -- a
+    // list header <th> carries its data-name attribute regardless of any
+    // row's value (web/static/src/js/views/list/list_renderer.js
+    // ::_renderHeaderCell), so this does not depend on which rows ended
+    // up "To Generate" versus "Skipped". The per-row outcome is a value
+    // fact and stays with the unit tests (tests/test_data_va_generator.yaml,
+    // tests/test_data_va_generator_skip.yaml).
+    function assertGenerationStatusColumn() {
+        return [
+            {
+                content: "Open the Source Data tab",
+                trigger: ".o_notebook .nav-link:contains(Source Data)",
+            },
+            {
+                content: "The Generation Status column is displayed",
+                trigger:
+                    ".o_field_widget[name='source_data_ids'] " +
+                    "th[data-name='generation_state']",
+                run: function () {
+                    // Assertion only; do not trigger the default click
+                    // action.
+                },
+            },
+        ];
+    }
+
     // IK: docs/va_generator/01-create.md
     tour.register(
         "ssi_va_va_generator_create",
@@ -654,7 +682,12 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
 
             // ── Post-Condition — Approval records are created for each
             // approver level defined by the matching approval template.
-            assertApprovalRecords()
+            assertApprovalRecords(),
+
+            // ── Post-Condition (issue #82) — Every line in the Source
+            // Data tab receives a Generation Status of To Generate or
+            // Skipped.
+            assertGenerationStatusColumn()
 
             // The trailing paragraph of the IK -- the four Pre-Condition
             // checks that block Confirm with an error message when they
@@ -698,7 +731,14 @@ odoo.define("ssi_va.va_generator_tour", function (require) {
             // and the generated Virtual Account records are values, and
             // the Keputusan Desain of this item keeps them with the unit
             // tests (tests/test_data_va_generator.yaml).
-            assertStatus("Done", "done")
+            assertStatus("Done", "done"),
+
+            // ── Post-Condition (issue #82) — the Generated Bank Accounts
+            // tab is populated only for Source Data / bank code
+            // combinations whose number does not already exist; a
+            // combination that already exists is skipped instead, and its
+            // Generation Status is Skipped.
+            assertGenerationStatusColumn()
         )
     );
 
