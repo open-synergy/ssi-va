@@ -121,8 +121,8 @@ scenarios:
         expect_count: 1
 
   - name:
-      "Full workflow skips a fully colliding VA number without error and reaches done with
-      no bank account created"
+      "Full workflow skips a fully colliding VA number without error and reaches done
+      with no bank account created"
     steps:
       - step: "Create generator type"
         action: "create"
@@ -225,7 +225,8 @@ scenarios:
           state:
             type: "value"
             expected: "done"
-      - step: "Source data line stays skipped after done, with the same colliding number"
+      - step:
+          "Source data line stays skipped after done, with the same colliding number"
         action: "assert"
         target: "source_line"
         refresh: true
@@ -394,7 +395,8 @@ scenarios:
             type: "value"
             expected: 1
 
-  - name: "Restarting a confirmed document resets every source data line back to pending"
+  - name:
+      "Restarting a confirmed document resets every source data line back to pending"
     steps:
       - step: "Create generator type"
         action: "create"
