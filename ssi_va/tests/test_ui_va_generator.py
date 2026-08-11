@@ -486,6 +486,12 @@ class TestUiVAGenerator(HttpSavepointCase):
         belong to the unit tests and are covered by the "Confirm ...
         raises" scenarios of ``tests/test_data_va_generator.yaml``.
 
+        The tour also asserts that the Generation Status column is
+        displayed in the Source Data tab (issue #82). Only the
+        column's presence is checked; which rows end up To Generate
+        versus Skipped is a value fact covered by
+        ``tests/test_data_va_generator_skip.yaml``.
+
         IK: docs/va_generator/04-confirm.md
         """
         self.start_tour("/web", "ssi_va_va_generator_confirm", login="admin")
@@ -500,6 +506,12 @@ class TestUiVAGenerator(HttpSavepointCase):
         the issued document number and the generated Virtual Account
         bank accounts -- are values, and stay with the unit tests in
         ``tests/test_data_va_generator.yaml``.
+
+        The tour also asserts that the Generation Status column is
+        still displayed in the Source Data tab after the document
+        reaches Done (issue #82); which rows are Generated versus
+        Skipped is a value fact covered by
+        ``tests/test_data_va_generator_skip.yaml``.
 
         IK: docs/va_generator/05-approve.md
         """

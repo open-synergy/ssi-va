@@ -24,3 +24,5 @@
 ## Post-Condition
 
 - Status returns to **Draft**.
+- Every line in the **Source Data** tab returns to **Pending**, with **VA Number** and
+  **Existing Bank Accounts** cleared.

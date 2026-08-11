@@ -34,6 +34,9 @@
 - Status changes to **Waiting for Approval**.
 - Approval records are created for each approver level defined by the matching approval
   template.
+- Every line in the **Source Data** tab receives a **Generation Status** of either
+  **To Generate** or **Skipped**. A **Skipped** line shows the **VA Number** that is
+  already taken, along with the **Existing Bank Accounts** that caused it to be skipped.
 
 Any of the four checks in **Pre-Condition** that is not met blocks the Confirm action
 with a corresponding error message instead of producing the result above:

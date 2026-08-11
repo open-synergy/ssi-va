@@ -30,8 +30,11 @@
 - If there are still pending approval levels after this approval, status remains
   **Waiting for Approval** and the next level becomes pending.
 - If this was the last pending approval level, the document automatically transitions to
-  **Done** — there is no separate **Done** button for this model. As part of that
-  automatic transition:
+  **Done** — there is no separate **Done** button for this model, and this happens even if
+  every line in the **Source Data** tab ends up skipped. As part of that automatic
+  transition:
   - The document number is issued, replacing **/**.
-  - The **Generated Bank Accounts** tab is populated with one bank account per
-    combination of **Source Data** line and biller/merchant bank code.
+  - The **Generated Bank Accounts** tab is populated only for combinations of **Source
+    Data** line and biller/merchant bank code whose Virtual Account number does not yet
+    exist in the system. A combination whose number already exists is skipped instead,
+    and the corresponding **Source Data** line's **Generation Status** is **Skipped**.
