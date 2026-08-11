@@ -1,0 +1,498 @@
+options:
+  auto_refresh: true
+
+setup:
+  steps:
+    - step: "Get ir.model record for res.partner"
+      action: "ref"
+      xml_id: "base.model_res_partner"
+      save_as: "model_res_partner"
+
+    - step: "Create bank A"
+      action: "create"
+      model: "res.bank"
+      save_as: "bank_a"
+      values:
+        name: "Bank A (skip)"
+
+scenarios:
+  - name: "Full workflow without any collision generates the bank account normally"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Skip Type A"
+          code: "/"
+          python_code: 'result = "S1U"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Skip Biller A"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "S1B"
+      - step: "Create source partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Skip Partner A"
+      - step: "Create VA generator"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        save_as: "source_line"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Source data line is evaluated as to_generate, with its preview number"
+        action: "assert"
+        target: "source_line"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "to_generate"
+          acc_number:
+            type: "value"
+            expected: "S1BS1U"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "Source data line is marked generated with the final number"
+        action: "assert"
+        target: "source_line"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "generated"
+          acc_number:
+            type: "value"
+            expected: "S1BS1U"
+      - step: "No source data was skipped"
+        action: "assert"
+        target: "generator"
+        refresh: true
+        asserts:
+          num_of_skipped_source_data:
+            type: "value"
+            expected: 0
+      - step: "Exactly one bank account was generated"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "bank_account"
+        expect_count: 1
+
+  - name:
+      "Full workflow skips a fully colliding VA number without error and reaches done with
+      no bank account created"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Skip Type B"
+          code: "/"
+          python_code: 'result = "S2U"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Skip Biller B"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "S2B"
+      - step: "Create the partner holding the pre-existing colliding bank account"
+        action: "create"
+        model: "res.partner"
+        save_as: "conflict_partner"
+        values:
+          name: "Skip Conflict Holder B"
+      - step:
+          "Pre-create a bank account whose sanitized number already matches what this
+          document would generate"
+        action: "create"
+        model: "res.partner.bank"
+        save_as: "conflicting_account"
+        values:
+          partner_id: "REC: conflict_partner.id"
+          bank_id: "REC: bank_a.id"
+          acc_number: "S2BS2U"
+          company_id: "REF: base.main_company"
+      - step: "Create source partner (different from the conflict holder)"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Skip Partner B"
+      - step: "Create VA generator"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        save_as: "source_line"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator - must not raise despite the collision"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step:
+          "Source data line is evaluated as skipped, recording the colliding number and
+          the account that caused it"
+        action: "assert"
+        target: "source_line"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "skipped"
+          acc_number:
+            type: "value"
+            expected: "S2BS2U"
+          existing_bank_account_ids:
+            type: "m2m"
+            check: "contains"
+            expected_records:
+              - "REC: conflicting_account"
+      - step:
+          "Approve VA generator, which triggers action_done - must not raise despite the
+          collision"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "Source data line stays skipped after done, with the same colliding number"
+        action: "assert"
+        target: "source_line"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "skipped"
+          acc_number:
+            type: "value"
+            expected: "S2BS2U"
+      - step: "The document has one skipped source data and no generated bank account"
+        action: "assert"
+        target: "generator"
+        refresh: true
+        asserts:
+          num_of_skipped_source_data:
+            type: "value"
+            expected: 1
+          bank_account_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 0
+      - step: "No new res.partner.bank record was created for the document"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "remaining_bank_account"
+        expect_count: 0
+
+  - name:
+      "Full workflow on a mixed batch generates only the source data line whose number
+      does not collide"
+    steps:
+      - step: "Create generator type composing the number from the resolved partner id"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Skip Type C"
+          code: "/"
+          python_code: 'result = "%s" % partner.id'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Skip Biller C"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "S3B"
+      - step: "Create the first source partner (will collide)"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner_1"
+        values:
+          name: "Skip Partner C1"
+      - step: "Create the second source partner (will not collide)"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner_2"
+        values:
+          name: "Skip Partner C2"
+      - step: "Create the partner holding the pre-existing colliding bank account"
+        action: "create"
+        model: "res.partner"
+        save_as: "conflict_partner"
+        values:
+          name: "Skip Conflict Holder C"
+      - step:
+          "Pre-create a bank account colliding with the number partner_1's line would
+          generate"
+        action: "create"
+        model: "res.partner.bank"
+        save_as: "conflicting_account"
+        values:
+          partner_id: "REC: conflict_partner.id"
+          bank_id: "REC: bank_a.id"
+          acc_number: 'EVAL: "S3B%s" % registry["partner_1"].id'
+          company_id: "REF: base.main_company"
+      - step: "Create VA generator"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the first (colliding) partner"
+        action: "create"
+        model: "va_generator.source_data"
+        save_as: "source_line_1"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner_1.id"
+      - step: "Add source data for the second (non-colliding) partner"
+        action: "create"
+        model: "va_generator.source_data"
+        save_as: "source_line_2"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner_2.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "First line (colliding) is evaluated as skipped"
+        action: "assert"
+        target: "source_line_1"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "skipped"
+      - step: "Second line (not colliding) is evaluated as to_generate"
+        action: "assert"
+        target: "source_line_2"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "to_generate"
+      - step: "Approve VA generator, which triggers action_done"
+        action: "call"
+        target: "generator"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+      - step: "Exactly one bank account was generated, not two"
+        action: "search"
+        model: "res.partner.bank"
+        domain:
+          - ["va_generator_id", "=", "REC: generator.id"]
+        save_as: "generated_account"
+        expect_count: 1
+      - step: "The generated bank account belongs to the second (non-colliding) partner"
+        action: "assert"
+        target: "generated_account"
+        asserts:
+          partner_id:
+            type: "m2o"
+            expected: "REC: partner_2"
+      - step: "The document has exactly one skipped source data"
+        action: "assert"
+        target: "generator"
+        refresh: true
+        asserts:
+          num_of_skipped_source_data:
+            type: "value"
+            expected: 1
+
+  - name: "Restarting a confirmed document resets every source data line back to pending"
+    steps:
+      - step: "Create generator type"
+        action: "create"
+        model: "va_generator_type"
+        save_as: "generator_type"
+        values:
+          name: "Skip Type D"
+          code: "/"
+          python_code: 'result = "S4U"'
+      - step: "Create biller"
+        action: "create"
+        model: "va_biller"
+        save_as: "biller"
+        values:
+          name: "Skip Biller D"
+          code: "/"
+      - step: "Create bank code for the biller"
+        action: "create"
+        model: "va_biller.code"
+        save_as: "biller_code"
+        values:
+          va_biller_id: "REC: biller.id"
+          bank_id: "REC: bank_a.id"
+          biller_code: "S4B"
+      - step: "Create source partner"
+        action: "create"
+        model: "res.partner"
+        save_as: "partner"
+        values:
+          name: "Skip Partner D"
+      - step: "Create VA generator"
+        action: "create"
+        model: "va_generator"
+        save_as: "generator"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: generator_type.id"
+          bank_id: "REC: bank_a.id"
+          biller_id: "REC: biller.id"
+      - step: "Add source data for the partner"
+        action: "create"
+        model: "va_generator.source_data"
+        save_as: "source_line"
+        values:
+          va_generator_id: "REC: generator.id"
+          model_id: "REC: model_res_partner.id"
+          res_id: "REC: partner.id"
+      - step: "Confirm VA generator"
+        action: "call"
+        target: "generator"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+      - step: "Sanity check: the line was evaluated (not left pending) before restart"
+        action: "assert"
+        target: "source_line"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "to_generate"
+      - step:
+          "Restart the document back to draft (bypassing the restart policy, which by
+          design only allows restart from cancel/reject - out of scope for this issue;
+          this proves the source data reset behavior of the restart hook itself)"
+        action: "call"
+        target: "generator"
+        method: "action_restart"
+        as_user: "base.user_admin"
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
+      - step: "The source data line is reset back to pending, with no number or account"
+        action: "assert"
+        target: "source_line"
+        refresh: true
+        asserts:
+          generation_state:
+            type: "value"
+            expected: "pending"
+          acc_number:
+            type: "value"
+            operator: "is_falsy"
+          existing_bank_account_ids:
+            type: "m2m"
+            check: "count"
+            expected_count: 0
+      - step: "The skipped source data counter is back to zero"
+        action: "assert"
+        target: "generator"
+        refresh: true
+        asserts:
+          num_of_skipped_source_data:
+            type: "value"
+            expected: 0

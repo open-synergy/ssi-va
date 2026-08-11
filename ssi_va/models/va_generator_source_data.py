@@ -57,6 +57,46 @@ class VAGeneratorSourceData(models.Model):
         "Source Model and Source Record ID. Used for display/"
         "navigation purposes only.",
     )
+    generation_state = fields.Selection(
+        string="Generation Status",
+        selection=[
+            ("pending", "Pending"),
+            ("to_generate", "To Generate"),
+            ("skipped", "Skipped"),
+            ("generated", "Generated"),
+        ],
+        required=True,
+        default="pending",
+        readonly=True,
+        help="Outcome of Virtual Account generation for this line. "
+        "Pending = not evaluated yet (before confirm). To Generate = "
+        "evaluated at confirm, at least one Virtual Account number "
+        "does not exist yet. Skipped = every Virtual Account number "
+        "computed for this line already exists as a bank account, so "
+        "none was (or will be) created for it. Generated = at least "
+        "one bank account was actually created for this line when "
+        "the document reached done.",
+    )
+    acc_number = fields.Char(
+        string="VA Number",
+        readonly=True,
+        help="Virtual Account number(s) computed for this line, as of "
+        "the last evaluation (confirm or done). Multiple numbers "
+        "(when the biller/merchant holds more than one code for the "
+        "document's bank) are joined with ', '.",
+    )
+    existing_bank_account_ids = fields.Many2many(
+        string="Existing Bank Accounts",
+        comodel_name="res.partner.bank",
+        relation="va_generator_source_data_2_res_partner_bank",
+        column1="source_data_id",
+        column2="bank_account_id",
+        readonly=True,
+        help="Already-existing bank account(s) that collide with one "
+        "or more of this line's computed Virtual Account number(s) "
+        "(same sanitized account number and company), causing that "
+        "number to be skipped instead of generating a duplicate.",
+    )
 
     @api.model
     def _selection_target_model(self):
