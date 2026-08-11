@@ -85,11 +85,18 @@
             </xpath>
             <xpath expr="//page[1]" position="before">
                 <page name="source_data" string="Source Data">
+                    <field name="num_of_skipped_source_data" />
                     <field name="source_data_ids">
                         <tree create="0" delete="0" edit="0">
                             <field name="model_id" />
                             <field name="res_id" />
                             <field name="source_data_id" />
+                            <field name="generation_state" />
+                            <field name="acc_number" />
+                            <field
+                                    name="existing_bank_account_ids"
+                                    widget="many2many_tags"
+                                />
                         </tree>
                     </field>
                 </page>
