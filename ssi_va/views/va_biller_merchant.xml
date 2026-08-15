@@ -45,6 +45,13 @@
                             <field name="bank_id" readonly="1" />
                             <field name="merchant_code" />
                         </tree>
+                        <form>
+                            <group>
+                                <field name="biller_id" />
+                                <field name="bank_id" readonly="1" />
+                                <field name="merchant_code" />
+                            </group>
+                        </form>
                     </field>
                 </page>
             </xpath>

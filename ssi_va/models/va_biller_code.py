@@ -6,7 +6,7 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class VABillerCode(models.Model):
+class VaBillerCode(models.Model):
     """
     Represents the Virtual Account code issued by a specific bank for a
     biller (``va_biller``). A biller can have at most one code per bank.
@@ -46,6 +46,12 @@ class VABillerCode(models.Model):
 
     @api.constrains("va_biller_id", "bank_id")
     def _check_duplicate_bank_id(self):
+        """Ensure a biller has at most one code per bank.
+
+        Raises ``ValidationError`` when another ``va_biller.code``
+        record already exists for the same ``va_biller_id`` and
+        ``bank_id`` combination.
+        """
         for record in self.sudo():
             if not record._check_duplicate_bank_id_condition():
                 error_message = """
@@ -62,6 +68,11 @@ of adding a duplicate one
                 raise ValidationError(error_message)
 
     def _check_duplicate_bank_id_condition(self):
+        """Return whether this record's bank is still unique for its biller.
+
+        :return: ``True`` when no other ``va_biller.code`` shares the
+            same ``va_biller_id``/``bank_id`` pair, ``False`` otherwise
+        """
         self.ensure_one()
         if not self.va_biller_id or not self.bank_id:
             return True
@@ -75,6 +86,13 @@ of adding a duplicate one
         return not duplicate
 
     def name_get(self):
+        """Build a display name combining biller, bank and code.
+
+        Overridden so this model reads informatively when selected
+        from a Many2one dropdown (e.g. ``va_biller_merchant.code``).
+
+        :return: list of ``(id, name)`` tuples
+        """
         result = []
         for record in self:
             name = "%s - %s (%s)" % (

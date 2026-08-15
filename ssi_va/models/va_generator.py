@@ -11,7 +11,7 @@ from odoo.addons.base.models.res_bank import sanitize_account_number
 from odoo.addons.ssi_decorator import ssi_decorator
 
 
-class VAGenerator(models.Model):
+class VaGenerator(models.Model):
     """
     Represents a Virtual Account (VA) generation batch. Combines a biller
     (and, optionally, a merchant registered under that biller) with a
@@ -179,7 +179,7 @@ class VAGenerator(models.Model):
 
     @api.model
     def _get_policy_field(self):
-        res = super(VAGenerator, self)._get_policy_field()
+        res = super(VaGenerator, self)._get_policy_field()
         policy_field = [
             "confirm_ok",
             "approve_ok",
@@ -223,6 +223,12 @@ class VAGenerator(models.Model):
 
     @ssi_decorator.pre_confirm_check()
     def _10_check_source_data(self):
+        """Ensure the document has at least one source data line.
+
+        Raises ``UserError`` when ``source_data_ids`` is empty, since
+        there would be nothing to generate Virtual Account numbers
+        for.
+        """
         self.ensure_one()
         if not self.source_data_ids:
             error_message = """
@@ -267,6 +273,14 @@ bank, or choose a different bank/biller combination
 
     @ssi_decorator.pre_confirm_check()
     def _20_check_merchant_biller_code(self):
+        """Ensure the selected merchant has a code under the biller.
+
+        Raises ``UserError`` when a merchant is selected but
+        ``_get_merchant_biller_code_lines`` finds no matching biller
+        code line, since without one no Virtual Account bank account
+        could be generated for that merchant when the document
+        reaches done. Skipped entirely when no merchant is selected.
+        """
         self.ensure_one()
         if not self.merchant_id:
             return
@@ -289,6 +303,14 @@ biller level only
 
     @ssi_decorator.pre_confirm_check()
     def _30_check_partner(self):
+        """Ensure every source data line resolves to a single partner.
+
+        Raises ``UserError`` when
+        ``type_id.generate_partner`` raises for any
+        ``source_data_ids`` line, surfacing the underlying error so
+        the user can fix the generator type's partner resolution
+        Python code before confirming.
+        """
         self.ensure_one()
         for source in self.source_data_ids:
             try:
@@ -312,6 +334,11 @@ resolves this source data line into a single res.partner record
                 raise UserError(_(error_message))
 
     def _get_merchant_biller_code_lines(self):
+        """Find the merchant code lines matching the selected biller/bank.
+
+        :return: a ``va_biller_merchant.code`` recordset registered
+            for the current ``biller_id``/``bank_id`` combination
+        """
         self.ensure_one()
         return self.merchant_id.biller_code_ids.filtered(
             lambda line: line.biller_id.va_biller_id == self.biller_id
@@ -404,11 +431,21 @@ resolves this source data line into a single res.partner record
 
     @ssi_decorator.post_done_action()
     def _10_generate_bank_account(self):
+        """Generate the Virtual Account bank accounts on done.
+
+        Runs after the document reaches ``done`` (state already
+        written); delegates to ``_done``.
+        """
         self.ensure_one()
         self._done()
 
     @ssi_decorator.post_cancel_action()
     def _10_delete_bank_account(self):
+        """Delete every generated bank account when the document is cancelled.
+
+        Runs after the document reaches ``cancel`` (state already
+        written).
+        """
         self.ensure_one()
         self.bank_account_ids.unlink()
 
@@ -434,6 +471,15 @@ resolves this source data line into a single res.partner record
         )
 
     def _done(self):
+        """Generate the final Virtual Account bank accounts.
+
+        Rebuilds the bank schema lines and, for every source data
+        line, delegates to ``_generate_source_data`` to create the
+        missing ``res.partner.bank`` records.
+
+        :return: nothing; creates ``res.partner.bank`` records and
+            writes every line in ``source_data_ids``
+        """
         self.ensure_one()
         schema_lines = self._get_bank_schema_lines()
         for source in self.source_data_ids:
@@ -485,6 +531,14 @@ resolves this source data line into a single res.partner record
         )
 
     def _get_partner_localdict(self, source):
+        """Build the ``safe_eval`` localdict for partner resolution.
+
+        Extension point: override to expose additional variables to
+        ``type_id.generate_partner``'s ``partner_python_code``.
+
+        :param source: a ``va_generator.source_data`` record
+        :return: dict of localdict variables
+        """
         self.ensure_one()
         return {
             "generator": self,
@@ -495,6 +549,15 @@ resolves this source data line into a single res.partner record
         }
 
     def _get_bank_schema_lines(self):
+        """Build the schema (bank/biller code/merchant code) lines.
+
+        Reads from ``_get_merchant_biller_code_lines`` when a
+        merchant is selected, otherwise from ``biller_id.bank_code_ids``
+        filtered to ``bank_id``.
+
+        :return: list of dicts, each with keys ``bank``,
+            ``biller_code_str`` and ``merchant_code_str``
+        """
         self.ensure_one()
         result = []
         if self.merchant_id:
@@ -631,6 +694,16 @@ resolves this source data line into a single res.partner record
         )
 
     def _prepare_bank_account_data(self, partner, bank, acc_number):
+        """Build the ``res.partner.bank`` values for a generated account.
+
+        Extension point: override to write additional fields on the
+        generated bank account.
+
+        :param partner: the ``res.partner`` the account is for
+        :param bank: the ``res.bank`` the account is created at
+        :param acc_number: composed Virtual Account number string
+        :return: dict of ``res.partner.bank`` values
+        """
         self.ensure_one()
         return {
             "partner_id": partner.id,
@@ -641,10 +714,25 @@ resolves this source data line into a single res.partner record
         }
 
     def action_generate_export_file(self):
+        """Generate and attach the export file for the selected documents.
+
+        Delegates to ``_generate_export_file`` for every record in
+        ``self``, run with ``sudo()`` so the attachment can be
+        created regardless of the current user's rights.
+
+        :return: nothing; creates an ``ir.attachment`` per record
+        """
         for record in self.sudo():
             record._generate_export_file()
 
     def _generate_export_file(self):
+        """Generate the export file and store it as an attachment.
+
+        Raises ``UserError`` when the document is not in the
+        ``done`` state, or when no ``exporter_id`` is selected.
+
+        :return: nothing; creates an ``ir.attachment`` record
+        """
         self.ensure_one()
         if self.state != "done":
             error_message = """
@@ -678,6 +766,13 @@ Solution: Select an exporter before generating the export file
         )
 
     def _get_export_file_localdict(self):
+        """Build the ``safe_eval`` localdict for export file generation.
+
+        Extension point: override to expose additional variables to
+        ``exporter_id.generate_file``'s ``python_code``.
+
+        :return: dict of localdict variables
+        """
         self.ensure_one()
         return {
             "generator": self,
@@ -687,6 +782,12 @@ Solution: Select an exporter before generating the export file
         }
 
     def _prepare_export_file_attachment_data(self, content):
+        """Build the ``ir.attachment`` values for the export file.
+
+        :param content: export file bytes returned by
+            ``exporter_id.generate_file``
+        :return: dict of ``ir.attachment`` values
+        """
         self.ensure_one()
         return {
             "name": self._get_export_file_name(),
@@ -697,6 +798,16 @@ Solution: Select an exporter before generating the export file
         }
 
     def _get_export_file_name(self):
+        """Build the export file name from the document name and timestamp.
+
+        The document ``name`` has any ``/`` replaced with ``-`` (the
+        Virtual Account sequence uses ``/`` as a separator, which is
+        not a safe filename character), followed by a
+        ``YYYYmmdd_HHMMSS`` timestamp and the exporter's file
+        extension.
+
+        :return: export file name string
+        """
         self.ensure_one()
         timestamp = fields.Datetime.now().strftime("%Y%m%d_%H%M%S")
         extension = self.exporter_id.get_file_extension()

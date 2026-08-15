@@ -6,6 +6,13 @@ from odoo import fields, models
 
 
 class ResPartnerBank(models.Model):
+    """
+    Adds Virtual Account generator traceability to partner bank
+    accounts. Links each bank account created by a ``va_generator``
+    document back to the document that produced it, so the origin
+    stays auditable.
+    """
+
     _name = "res.partner.bank"
     _inherit = ["res.partner.bank"]
 

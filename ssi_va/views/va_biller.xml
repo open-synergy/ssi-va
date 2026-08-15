@@ -44,6 +44,12 @@
                             <field name="bank_id" />
                             <field name="biller_code" />
                         </tree>
+                        <form>
+                            <group>
+                                <field name="bank_id" />
+                                <field name="biller_code" />
+                            </group>
+                        </form>
                     </field>
                 </page>
             </xpath>

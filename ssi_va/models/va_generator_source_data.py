@@ -6,7 +6,7 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class VAGeneratorSourceData(models.Model):
+class VaGeneratorSourceData(models.Model):
     """
     Represents one source record (e.g. a partner) that a Virtual
     Account (VA) generator document (``va_generator``) generates VA
@@ -104,6 +104,10 @@ class VAGeneratorSourceData(models.Model):
 
     @api.depends("model_name", "res_id")
     def _compute_source_data_id(self):
+        """Build the display reference from model name and record ID.
+
+        :return: nothing; assigns ``source_data_id``
+        """
         for record in self:
             result = False
             if record.model_name and record.res_id:
@@ -112,6 +116,13 @@ class VAGeneratorSourceData(models.Model):
 
     @api.constrains("va_generator_id", "model_id", "res_id")
     def _check_duplicate_source_data(self):
+        """Ensure a source record is not added twice to the same generator.
+
+        Raises ``ValidationError`` when another
+        ``va_generator.source_data`` line already exists for the
+        same ``va_generator_id``, ``model_id`` and ``res_id``
+        combination.
+        """
         for record in self.sudo():
             if not record._check_duplicate_source_data_condition():
                 error_message = """
@@ -128,6 +139,13 @@ one instead of adding a new one
                 raise ValidationError(error_message)
 
     def _check_duplicate_source_data_condition(self):
+        """Return whether this record's source is still unique for its generator.
+
+        :return: ``True`` when no other
+            ``va_generator.source_data`` shares the same
+            ``va_generator_id``/``model_id``/``res_id`` combination,
+            ``False`` otherwise
+        """
         self.ensure_one()
         if not self.va_generator_id or not self.model_id or not self.res_id:
             return True

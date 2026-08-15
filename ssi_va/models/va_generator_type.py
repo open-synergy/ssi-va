@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
 
-class VAGeneratorType(models.Model):
+class VaGeneratorType(models.Model):
     """
     Represents a Virtual Account (VA) code generation strategy. The
     strategy is written as configurable Python code (``python_code``)

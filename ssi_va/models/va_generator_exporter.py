@@ -12,7 +12,7 @@ from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
 
-class VAGeneratorExporter(models.Model):
+class VaGeneratorExporter(models.Model):
     """
     Represents a Virtual Account (VA) export layout for a specific bank or
     provider file format. The layout is written as configurable Python code
@@ -121,6 +121,12 @@ Solution: Fix python_code so 'result' is a list where each item is a list or tup
         return self._generate_xlsx_file(result)
 
     def _generate_xlsx_file(self, result):
+        """Serialize export rows to an in-memory XLSX file.
+
+        :param result: list of list/tuple rows computed by
+            ``python_code``
+        :return: XLSX file content as ``bytes``
+        """
         self.ensure_one()
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {"in_memory": True})
@@ -134,6 +140,15 @@ Solution: Fix python_code so 'result' is a list where each item is a list or tup
         return output.getvalue()
 
     def _generate_csv_file(self, result):
+        """Serialize export rows to a CSV file.
+
+        Uses ``csv_delimiter`` (defaulting to ``,``) as the column
+        delimiter.
+
+        :param result: list of list/tuple rows computed by
+            ``python_code``
+        :return: CSV file content encoded as ``bytes`` (UTF-8)
+        """
         self.ensure_one()
         output = io.StringIO()
         writer = csv.writer(

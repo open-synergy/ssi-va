@@ -6,7 +6,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class GenerateVA(models.TransientModel):
+class GenerateVa(models.TransientModel):
     """
     Wizard to generate a Virtual Account (VA) generator document
     (``va_generator``) out of the record(s) it is launched from,
@@ -85,21 +85,54 @@ class GenerateVA(models.TransientModel):
         self.merchant_id = False
 
     def action_generate(self):
+        """Create the ``va_generator`` document and open it.
+
+        Delegates to ``_generate`` for every record in ``self``, run
+        with ``sudo()`` so the document can be created regardless of
+        the current user's rights.
+
+        :return: an ``ir.actions.act_window`` dict opening the
+            created ``va_generator`` document
+        """
         for record in self.sudo():
             result = record._generate()
         return result
 
     def _generate(self):
+        """Validate the wizard input and create the ``va_generator``.
+
+        Raises ``UserError`` (via ``_check_type_id``) when the
+        selected generator type is restricted to a model different
+        from the one this wizard was launched from.
+
+        :return: an ``ir.actions.act_window`` dict opening the
+            created ``va_generator`` document
+        """
         self.ensure_one()
         self._check_type_id()
         generator = self.env["va_generator"].create(self._prepare_va_generator_data())
         return self._open_va_generator(generator)
 
     def _get_source_model_criteria(self):
+        """Build the domain matching the wizard's source ``ir.model``.
+
+        Extension point: override to widen or narrow how the source
+        model is resolved from the launching context.
+
+        :return: an Odoo search domain
+        """
         active_model = self.env.context.get("active_model")
         return [("model", "=", active_model)]
 
     def _get_source_model(self):
+        """Resolve the ``ir.model`` this wizard was launched from.
+
+        Raises ``UserError`` when the context carries no
+        ``active_model``, or when it does not resolve to a known
+        model.
+
+        :return: a single ``ir.model`` record
+        """
         self.ensure_one()
         active_model = self.env.context.get("active_model")
         model = (
@@ -125,6 +158,13 @@ context carries a valid active_model
         return model
 
     def _get_source_res_ids(self):
+        """Resolve the source record IDs from the launching context.
+
+        Raises ``UserError`` when the context carries no
+        ``active_ids``.
+
+        :return: list of source record database IDs
+        """
         self.ensure_one()
         active_ids = self.env.context.get("active_ids", [])
         if not active_ids:
@@ -142,6 +182,11 @@ Solution: Select at least one record before generating Virtual Account
         return active_ids
 
     def _check_type_id(self):
+        """Ensure the selected generator type accepts the source model.
+
+        Raises ``UserError`` when ``type_id.model_id`` is set and
+        differs from the model this wizard was launched from.
+        """
         self.ensure_one()
         source_model = self._get_source_model()
         restrict_model = self.type_id.model_id
@@ -186,6 +231,11 @@ restricted to %s
         }
 
     def _prepare_source_data_data(self, res_id):
+        """Build one ``va_generator.source_data`` line's ``create()`` values.
+
+        :param res_id: database ID of the source record
+        :return: dict of ``va_generator.source_data`` values
+        """
         self.ensure_one()
         return {
             "model_id": self._get_source_model().id,
@@ -193,6 +243,11 @@ restricted to %s
         }
 
     def _open_va_generator(self, generator):
+        """Build the action opening the created ``va_generator`` document.
+
+        :param generator: the created ``va_generator`` record
+        :return: an ``ir.actions.act_window`` dict
+        """
         self.ensure_one()
         return {
             "name": _("Generate VA"),

@@ -5,7 +5,7 @@
 from odoo import fields, models
 
 
-class VABillerMerchant(models.Model):
+class VaBillerMerchant(models.Model):
     """
     Represents a merchant (sub-entity of a biller-bank combination, e.g. a
     branch/outlet) that has its own merchant code registered for that
