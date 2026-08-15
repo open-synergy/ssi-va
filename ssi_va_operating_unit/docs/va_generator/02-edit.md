@@ -1,7 +1,7 @@
 # Edit Virtual Account Generator
 
-> **Module:** ssi_va_operating_unit **Extends:** ssi_va — model `va_generator`, aksi
-> `02-edit`
+> **Module:** ssi_va_operating_unit
+> **Extends:** ssi_va — model `va_generator`, aksi `02-edit`
 
 ## Additional Fields
 
