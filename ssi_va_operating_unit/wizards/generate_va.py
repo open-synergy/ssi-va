@@ -5,7 +5,7 @@
 from odoo import fields, models
 
 
-class GenerateVA(models.TransientModel):
+class GenerateVa(models.TransientModel):
     """
     Extends the ``generate_va`` wizard with an ``operating_unit_id``
     field, whose value is passed through as-is to the ``va_generator``
