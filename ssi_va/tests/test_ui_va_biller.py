@@ -142,10 +142,6 @@ class TestUiVABiller(HttpSavepointCase):
     def test_activate(self):
         """Run the activate tour for ``va_biller``.
 
-        The IK Flow ends with "Click OK to confirm", but 14.0 shows no
-        confirmation dialog for Unarchive, so the tour has no step for
-        it; see the comment in the tour file.
-
         IK: docs/va_biller/05-activate.md
         """
         self.start_tour("/web", "ssi_va_va_biller_activate", login="admin")

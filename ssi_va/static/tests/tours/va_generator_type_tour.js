@@ -540,18 +540,6 @@ odoo.define("ssi_va.va_generator_type_tour", function (require) {
                     },
                 },
 
-                // ── Flow 5 (IK text) — "Click OK to confirm." There is no
-                // step for it because 14.0 shows no dialog for Unarchive:
-                // in web/static/src/js/views/list/list_controller.js
-                // (_getActionMenuItems) only "Archive" wraps its callback in
-                // Dialog.confirm(...), while "Unarchive" calls
-                // _toggleArchiveState(false) straight away. Adding a dialog
-                // step here would hang the tour on a modal that never opens.
-                // This is an inaccuracy in
-                // docs/va_generator_type/05-activate.md; changing IK files is
-                // explicitly out of scope for this change, so it is reported
-                // on the IK issue instead of being patched here.
-
                 // ── Post-Condition — The record is restored and belongs to
                 // the default (active) list again. With the Archived filter
                 // still on -- turning it off is not a step of this IK -- the
