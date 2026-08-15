@@ -9,5 +9,8 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestVABillerMerchant(YamlTransactionCase):
+    """Cover CRUD and constraint scenarios for ``va_biller_merchant``."""
+
     def test_va_biller_merchant(self):
+        """Run the master data and biller code YAML scenario."""
         self.run_yaml_scenario("test_data_va_biller_merchant.yaml")

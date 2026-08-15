@@ -9,5 +9,8 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestIrModel(YamlTransactionCase):
+    """Cover the Generate VA wizard binding action on ``ir.model``."""
+
     def test_ir_model(self):
+        """Run the wizard binding YAML scenario."""
         self.run_yaml_scenario("test_data_ir_model.yaml")

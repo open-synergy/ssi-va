@@ -9,7 +9,10 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestGenerateVA(YamlTransactionCase):
+    """Cover the ``generate_va`` wizard's document creation flow."""
+
     def test_generate_va(self):
+        """Run the wizard YAML scenario."""
         self.run_yaml_scenario("test_data_generate_va.yaml")
 
     def test_action_generate_returns_action(self):

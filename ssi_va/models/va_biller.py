@@ -5,7 +5,7 @@
 from odoo import fields, models
 
 
-class VABiller(models.Model):
+class VaBiller(models.Model):
     """
     Represents a biller entity that receives payment through Virtual
     Account (VA). A biller may hold a different VA code per bank,

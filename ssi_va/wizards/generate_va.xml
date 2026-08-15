@@ -19,12 +19,7 @@
                     <field name="exporter_id" />
                 </group>
                 <footer>
-                    <button
-                            string="Generate VA"
-                            class="oe_highlight"
-                            type="object"
-                            name="action_generate"
-                        />
+                    <button string="Generate VA" type="object" name="action_generate" />
                     <button
                             string="Cancel"
                             class="oe_link"

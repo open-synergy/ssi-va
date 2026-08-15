@@ -6,7 +6,7 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class VABillerMerchantCode(models.Model):
+class VaBillerMerchantCode(models.Model):
     """
     Represents the merchant code registered for a specific biller-bank
     combination (``va_biller.code``). A merchant can have at most one
@@ -56,6 +56,12 @@ class VABillerMerchantCode(models.Model):
 
     @api.constrains("va_biller_merchant_id", "biller_id")
     def _check_duplicate_biller_id(self):
+        """Ensure a merchant has at most one code per biller-bank line.
+
+        Raises ``ValidationError`` when another
+        ``va_biller_merchant.code`` record already exists for the
+        same ``va_biller_merchant_id`` and ``biller_id`` combination.
+        """
         for record in self.sudo():
             if not record._check_duplicate_biller_id_condition():
                 error_message = """
@@ -73,6 +79,12 @@ biller code instead of adding a duplicate one
                 raise ValidationError(error_message)
 
     def _check_duplicate_biller_id_condition(self):
+        """Return whether this record's biller code is still unique.
+
+        :return: ``True`` when no other ``va_biller_merchant.code``
+            shares the same ``va_biller_merchant_id``/``biller_id``
+            pair, ``False`` otherwise
+        """
         self.ensure_one()
         if not self.va_biller_merchant_id or not self.biller_id:
             return True

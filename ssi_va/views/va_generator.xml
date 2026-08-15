@@ -98,6 +98,19 @@
                                     widget="many2many_tags"
                                 />
                         </tree>
+                        <form>
+                            <group>
+                                <field name="model_id" />
+                                <field name="res_id" />
+                                <field name="source_data_id" />
+                                <field name="generation_state" />
+                                <field name="acc_number" />
+                                <field
+                                        name="existing_bank_account_ids"
+                                        widget="many2many_tags"
+                                    />
+                            </group>
+                        </form>
                     </field>
                 </page>
                 <page name="bank_account" string="Generated Bank Accounts">
@@ -107,6 +120,13 @@
                             <field name="bank_id" />
                             <field name="acc_number" />
                         </tree>
+                        <form>
+                            <group>
+                                <field name="partner_id" />
+                                <field name="bank_id" />
+                                <field name="acc_number" />
+                            </group>
+                        </form>
                     </field>
                 </page>
             </xpath>

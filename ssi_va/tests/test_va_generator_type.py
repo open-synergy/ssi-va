@@ -9,7 +9,10 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestVAGeneratorType(YamlTransactionCase):
+    """Cover CRUD and code generation scenarios for ``va_generator_type``."""
+
     def test_va_generator_type(self):
+        """Run the master data YAML scenario."""
         self.run_yaml_scenario("test_data_va_generator_type.yaml")
 
     def test_generate_code_returns_result(self):

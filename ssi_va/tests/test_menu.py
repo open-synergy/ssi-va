@@ -9,5 +9,8 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestMenu(YamlTransactionCase):
+    """Cover the module's menu structure and placement."""
+
     def test_menu_placement(self):
+        """Run the menu placement YAML scenario."""
         self.run_yaml_scenario("test_data_menu.yaml")

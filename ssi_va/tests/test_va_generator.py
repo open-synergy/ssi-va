@@ -9,7 +9,10 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestVAGenerator(YamlTransactionCase):
+    """Cover the confirm/approve/done workflow for ``va_generator``."""
+
     def test_va_generator(self):
+        """Run the transaction workflow YAML scenario."""
         self.run_yaml_scenario("test_data_va_generator.yaml")
 
     def test_export_file_name_pattern(self):
