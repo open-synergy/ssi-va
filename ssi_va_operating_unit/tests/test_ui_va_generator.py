@@ -47,6 +47,14 @@ class TestUiVAGeneratorOperatingUnit(HttpSavepointCase):
         * ``Access`` of the base Flow -- the same user is put in
           ``Virtual Account Generator / User``, the group the base IK
           names as actor for both ``01-create.md`` and ``02-edit.md``.
+          It is also put in ``Virtual Account Generator / All``: the
+          ``va_generator_internal_user_rule`` record rule restricts a
+          plain internal user to the documents they are responsible for
+          (``user_id``), and the ``generator_edit`` document below is
+          created by the test cursor's own user rather than by admin, so
+          without this group the edit tour's list would render empty for
+          admin. ``ssi_va``'s own UI tests add the same group for the
+          same reason.
         * ``Data`` of the base Flow of ``01-create.md`` -- one
           ``res.partner`` to select in the Contacts list before opening
           the wizard.
@@ -68,8 +76,10 @@ class TestUiVAGeneratorOperatingUnit(HttpSavepointCase):
         super().setUpClass()
 
         cls.user_admin = cls.env.ref("base.user_admin")
-        groups = cls.env.ref("ssi_va.va_generator_user_group") + cls.env.ref(
-            "operating_unit.group_multi_operating_unit"
+        groups = (
+            cls.env.ref("ssi_va.va_generator_user_group")
+            + cls.env.ref("ssi_va.va_generator_all_group")
+            + cls.env.ref("operating_unit.group_multi_operating_unit")
         )
         groups.sudo().write(
             {
