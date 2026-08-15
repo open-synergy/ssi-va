@@ -21,9 +21,9 @@
     "data": [
         "security/res_group/va_generator.xml",
         "security/ir_rule/va_generator.xml",
-        "view/assets.xml",
-        "view/va_generator.xml",
-        "view/generate_va.xml",
+        "views/assets.xml",
+        "views/va_generator.xml",
+        "views/generate_va.xml",
     ],
     "demo": [],
 }

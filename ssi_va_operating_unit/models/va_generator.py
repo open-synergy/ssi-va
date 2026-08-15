@@ -5,7 +5,7 @@
 from odoo import models
 
 
-class VAGenerator(models.Model):
+class VaGenerator(models.Model):
     """
     Extends ``va_generator`` with a single Operating Unit (OU) per
     document, via ``mixin.single_operating_unit``. The ``operating_unit_id``

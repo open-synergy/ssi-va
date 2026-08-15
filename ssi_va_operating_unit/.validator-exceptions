@@ -1,0 +1,7 @@
+# Copyright 2026 OpenSynergy Indonesia
+# Copyright 2026 PT. Simetri Sinergi Indonesia
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+#
+# Penyimpangan yang sah dan permanen — lihat validator-contract.md §13.
+
+module acl-wizard-satu-user-access-tanpa-all-access|generate_va: tidak ada ACL sama sekali -- wizard generate_va di-inherit dari ssi_va mengikuti konvensi _name + _inherit; ACL-nya sudah ada sebagai ssi_va.generate_va_user_access, satu model tidak boleh punya dua ACL
